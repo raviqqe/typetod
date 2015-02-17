@@ -9,7 +9,7 @@ all:
 	@echo 'nothing to be compiled'
 
 install:
-	install -m 755 typetod.py ${BINDIR}/typetod
+	install -m 755 -D typetod.py ${BINDIR}/typetod
 
 clean:
 	@echo 'nothing to be cleaned'
