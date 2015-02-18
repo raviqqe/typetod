@@ -24,7 +24,7 @@ accurancy.
   buffer of samples during the game. You can use a pipe to do that.
 
 ## FAQ
-### How do you pronounce?
+### How do you pronounce it?
 type-to-D
 ### What is its license?
 typetod is unlicensed. I mean all source codes of typetod is in public domain
