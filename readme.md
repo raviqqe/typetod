@@ -7,15 +7,15 @@ typetod is a typing game that works on a terminal. It has four modes;
 * files mode
 * RSS feeds mode
 * stdin mode
-When you choose stdin mode or others with -d option, typetod becomes tod mode.
-It lets you type forever. And, typetod also evaluate your typing speed and
-accurancy.
+When you choose stdin mode or others with -d option, typetod becomes endless
+mode. It lets you type forever. And, typetod also evaluate your typing speed
+and accurancy.
 
 ## Game modes
 ### fortune mode
-  like gtypist, it takes benefitial tips from fortune command as samples.
+  Like gtypist, it takes benefitial tips from fortune command as samples.
 ### files mode
-  text in files as samples
+  Text in files as samples.
 ### RSS feeds mode
   If you specify the url of a RSS feed, items of the feed will appear on your
   screen. Then, you can select one of them as a sample.
@@ -27,7 +27,7 @@ accurancy.
 ### How do you pronounce it?
 type-to-D
 ### What is its license?
-typetod is unlicensed. I mean all source codes of typetod is in public domain
+typetod is unlicensed. I mean all source codes of typetod are in public domain
 and anyone can utilize them for theirselves.
 See [the page of unlicense.org](http://unlicense.org/).
 ### Who are you?
@@ -43,5 +43,5 @@ Mail [me](raviqqe@gmail.com).
 
 ## todo list
 * write man page
-* make it single width unicode compliant
-* make it double width unicode compliant
+* make it compliant to single-width unicode
+* make it compliant to double-width unicode
