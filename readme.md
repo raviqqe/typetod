@@ -3,10 +3,12 @@ typing game with endless mode written in python
 
 ## What is typetod?
 typetod is a typing game that works on a terminal. It has four modes;
+
 * fortune mode
 * files mode
 * RSS feeds mode
 * stdin mode
+
 When you choose stdin mode or others with -d option, typetod becomes endless
 mode. It lets you type forever. And, typetod also evaluate your typing speed
 and accurancy.
@@ -33,7 +35,7 @@ See [the page of unlicense.org](http://unlicense.org/).
 ### Who are you?
 Yes, I am.
 ### I don't like this app! I'll scold you. First, it does not adhere the unix design prin...
-Mail [me](raviqqe@gmail.com).
+Mail [me](mailto:raviqqe@gmail.com).
 
 ## Specification
 * endless typing game
