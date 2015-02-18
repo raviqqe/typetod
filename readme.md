@@ -35,7 +35,7 @@ Yes, I am.
 ### I don't like this app! I'll scold you. First, it does not adhere the unix design prin...
 Mail [me](raviqqe@gmail.com).
 
-## specification
+## Specification
 * endless typing game
 * one input line and sample lines scrolling upwards
 * fortune, text files, rss feeds, and stdin as samples
