@@ -18,6 +18,6 @@ build() {
 
 package() {
   cd $srcdir/$pkgname-$pkgver
-  make PREFIX=/usr DESTDIR=$pkgdir install
+  make PREFIX=/usr MANPREFIX=/usr/share DESTDIR=$pkgdir install
   install -m 644 -D UNLICENSE $pkgdir/usr/share/licenses/$pkgname/UNLICENSE
 }
