@@ -7,7 +7,8 @@ typetod [\-a <attribute>] [\-c] [\-d] [\-e] [\-f] [\-l <character>] [\-m] [\-q]
 .SH DESCRIPTION
 typetod is a typing game which has four modes; fortune mode (default), files
 mode, RSS feeds mode, and stdin mode. And, with the first three modes, you can
-play with its endless mode. 
+play with its endless mode. You can exit a game or leave from the screen
+anywhere typing an escape key or ctrl + e.
 .TP
 .I
 fortune mode
@@ -21,8 +22,8 @@ Text files as samples.
 RSS feeds mode
 When you run typetod specifying the url of a RSS feed, items of the feed will
 appear on your screen. Then, you can select one of them as a sample. On the
-menu screen, you can move downwards typing j and upwards typing k, and play
-the game with the title's article typing a space or enter key.
+menu screen, you can move downwards typing j and upwards typing k, and play a
+game with the title's article typing a space or enter key.
 .TP
 .I
 stdin mode
@@ -75,6 +76,10 @@ and input characters into spaces.
 .B \-u
 switches the game mode to RSS feeds mode. You also specify one url to the RSS
 feed as the command argument.
+.SH NOTES
+This program depends on the
+.I feedparser
+package of python.
 .SH EXAMPLE
 .TP
 typetod
@@ -92,3 +97,5 @@ cars.
 .TP
 fortune | typetod
 one-time fortune mode by stdin mode
+.SH SEE ALSO
+.I python
