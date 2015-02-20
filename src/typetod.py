@@ -66,6 +66,8 @@ TRANS_TABLE = {
   ord(u'\u201c'): '"',
   ord(u'\u201d'): '"',
   ord(u'\u2026'): '...',
+  ord(u'\u2028'): '\n',
+  ord(u'\u2029'): '\n',
   ord(u'\u20ac'): 'C',
   ord(u'\u3000'): ' ',
   ord(u'\u301c'): '~',
