@@ -9,7 +9,7 @@ license=('custom:UNLICENSE')
 depends=('python-feedparser')
 source=("https://github.com/raviqqe/$pkgname/"\
 "raw/master/pkg/$pkgname-$pkgver.tar.gz")
-md5sums=('72d1edfeeba66ccfdd73a80d23df536c')
+md5sums=('0c03f5c9c2e28b6f465b15c03e7f358f')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
