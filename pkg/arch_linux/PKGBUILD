@@ -1,4 +1,4 @@
-# maintainer: raviqqe <raviqqe@gmail.com>
+# Maintainer: raviqqe <raviqqe@gmail.com>
 pkgname=typetod
 pkgver=0.01
 pkgrel=1
@@ -9,7 +9,7 @@ license=('custom:UNLICENSE')
 depends=('python-feedparser')
 source=("https://github.com/raviqqe/$pkgname/"\
 "raw/master/pkg/$pkgname-$pkgver.tar.gz")
-md5sums=('0c03f5c9c2e28b6f465b15c03e7f358f')
+md5sums=('f3803ec6992435aea374586592497856')
 
 build() {
   cd $srcdir/$pkgname-$pkgver
