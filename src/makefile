@@ -15,7 +15,7 @@ all:
 install:
 	install -m 755 -D typetod.py ${BINDIR}/typetod
 	sed 's/VERSION/${VERSION}/' typetod.6 | gzip > typetod.6.gz
-	install -m 644 -D typetod.6.gz ${MANDIR}
+	install -m 644 -D typetod.6.gz ${MANDIR}/typetod.6.gz
 
 clean:
 	${RM} typetod.6.gz
