@@ -506,7 +506,7 @@ try:
           .format(getpass.getuser()))
       window.addstr(1, 0, "press any key...")
       char = window.getch()
-      if char == curses.ascii.ESC and char == 5: # 5 is ctrl + 'e'
+      if char == curses.ascii.ESC or char == 5: # 5 is ctrl + 'e'
         screen = Screen.exit
       else:
         if STATUS_BAR:
