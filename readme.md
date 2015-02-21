@@ -4,8 +4,6 @@ Here is [its tarball](https://github.com/raviqqe/typetod/raw/master/pkg/typetod-
 
 ![typetod screenshot](pic/screenshot.png)
 
-<script type="text/javascript" src="https://asciinema.org/a/16804.js" id="asciicast-16804" async></script>
-
 ## What is typetod?
 typetod is a typing game that works on a terminal. It has four modes;
 
