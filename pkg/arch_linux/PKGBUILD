@@ -1,7 +1,7 @@
 # Maintainer: raviqqe <raviqqe@gmail.com>
 pkgname=typetod
 pkgver=0.01
-pkgrel=1
+pkgrel=2
 pkgdesc="typing game with endless mode written in python"
 arch=('any')
 url="https://github.com/raviqqe/typetod"
