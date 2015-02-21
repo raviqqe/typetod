@@ -638,7 +638,8 @@ try:
         break
         
   # finalization
-  notebook.keypad(False)
+  if 'notebook' in locals():
+    notebook.keypad(False)
 except FailException as e:
   err_msg = e.args[0]
 except KeyboardInterrupt:
