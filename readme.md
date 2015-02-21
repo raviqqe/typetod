@@ -1,5 +1,6 @@
 # typetod
-typing game with endless mode written in python
+typing game with endless mode written in python.
+Here is [its tarball](https://github.com/raviqqe/typetod/raw/master/pkg/typetod-0.01.tar.gz).
 
 ## What is typetod?
 typetod is a typing game that works on a terminal. It has four modes;
