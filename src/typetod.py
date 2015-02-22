@@ -584,8 +584,6 @@ try:
       while not game.is_over():
         char = notebook.getch()
         if char == curses.ascii.ESC or char == 5: # 5 is ctrl + 'e'
-          if STATUS_BAR:
-            signal.setitimer(signal.ITIMER_REAL, 0)
           screen = Screen.leave
           break
         elif char == 21: # 21 is ctrl + 'u'
@@ -598,12 +596,12 @@ try:
           game.add_char(chr(char))
         notebook.refresh()
       else:
-        if STATUS_BAR:
-          signal.setitimer(signal.ITIMER_REAL, 0)
         if RESULT_SCREEN:
           screen = Screen.result
         else:
           screen = Screen.leave
+      if STATUS_BAR:
+        signal.setitimer(signal.ITIMER_REAL, 0)
 
     elif screen == Screen.result:
       window.clear()
