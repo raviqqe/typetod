@@ -148,6 +148,9 @@ class Game:
     self.__new_line()
     self.start_time = time.time()
 
+  def save_result(self):
+    self.speed = self.get_speed()
+
   def is_over(self):
     if len(self.sample_t) <= self.curr_sample_line:
       return True
@@ -189,7 +192,7 @@ class Game:
     if MORPHING:
       self.__morph()
     if self.is_over():
-      self.speed = self.get_speed()
+      self.save_result()
 
   def __add_char(self, char):
     self.input_t += char
@@ -584,7 +587,11 @@ try:
       while not game.is_over():
         char = notebook.getch()
         if char == curses.ascii.ESC or char == 5: # 5 is ctrl + 'e'
-          screen = Screen.leave
+          if TO_DEATH and RESULT_SCREEN:
+            game.save_result()
+            screen = Screen.result
+          else:
+            screen = Screen.leave
           break
         elif char == 21: # 21 is ctrl + 'u'
           game.clear_input_line()
