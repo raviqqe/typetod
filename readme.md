@@ -36,18 +36,11 @@ type-to-D
 typetod is unlicensed. I mean all source codes of typetod are in public domain
 and anyone can utilize them for theirselves.
 See [the page of unlicense.org](http://unlicense.org/).
-### Who are you?
-Yes, I am.
 ### I don't like this app! I'll scold you. First, it does not adhere the unix design prin...
 Mail [me](mailto:raviqqe@gmail.com).
 
 ## Specification
-* endless typing game
+* typing game with endless mode
 * one input line and sample lines scrolling upwards
 * fortune, text files, rss feeds, and stdin as samples
 * fast as possible in python
-
-## todo list
-* write man page
-* make it compliant to single-width unicode
-* make it compliant to double-width unicode
