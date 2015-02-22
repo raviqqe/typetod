@@ -606,20 +606,20 @@ try:
           screen = Screen.leave
 
     elif screen == Screen.result:
-        window.clear()
-        if TO_DEATH:
-          window.addstr(0, 0, "you survived!")
-        else:
-          window.addstr(0, 0, "you did it!")
-        window.addstr(1, 0, "{:9s} {:>8s}"
-            .format('speed:', game.get_speed()))
-        window.addstr(2, 0, "{:9s} {:>6s}"
-            .format('accuracy:', game.get_accuracy()))
-        window.addstr(3, 0, "{:9s} {:>5s}"
-            .format('typos:', game.get_errors()))
-        window.addstr(4, 0, "press any key...")
-        window.getch()
-        screen = Screen.leave
+      window.clear()
+      if TO_DEATH:
+        window.addstr(0, 0, "you survived!")
+      else:
+        window.addstr(0, 0, "you did it!")
+      window.addstr(1, 0, "{:9s} {:>8s}"
+          .format('speed:', game.get_speed()))
+      window.addstr(2, 0, "{:9s} {:>6s}"
+          .format('accuracy:', game.get_accuracy()))
+      window.addstr(3, 0, "{:9s} {:>5s}"
+          .format('typos:', game.get_errors()))
+      window.addstr(4, 0, "press any key...")
+      window.getch()
+      screen = Screen.leave
   
     elif screen == Screen.leave:
       window.clear()
