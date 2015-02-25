@@ -344,7 +344,7 @@ class Screen(enum.Enum):
 
   @classmethod
   def go_to_next_game(cls):
-    if GAME_MODE == M_RSS and not TO_DEATH:
+    if (GAME_MODE == M_RSS or GAME_MODE == M_FILES) and not TO_DEATH:
       return cls.menu
     else:
       return cls.game
