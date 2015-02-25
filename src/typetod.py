@@ -330,7 +330,7 @@ class Boss(threading.Thread):
     else:
       while self.game.is_almost_over() \
           and (GAME_MODE == M_FORTUNE
-          or GAME_MODE == M_FILES and len(files) > 0
+          or GAME_MODE == M_FILES and len(items) > 0
           or GAME_MODE == M_RSS and len(items) > 0):
         self.game.add_sample(gen_text())
 
@@ -379,7 +379,7 @@ def gen_text():
   if GAME_MODE == M_FORTUNE:
     return subprocess.check_output('fortune').decode('ascii')
   elif GAME_MODE == M_FILES:
-    with open(files.popleft(), 'r') as file:
+    with open(items.popleft(), 'r') as file:
       return uni_to_ascii(file.read())
   elif GAME_MODE == M_RSS:
     item = items.popleft()
@@ -457,12 +457,12 @@ if not os.isatty(0):
   stdin = os.fdopen(3, 'r')
 
 if GAME_MODE == M_FILES and len(args) > 0:
-  files = collections.deque([])
+  items = collections.deque([])
   for file in args:
     if os.path.isfile(file):
-      files.append(file)
+      items.append(file)
     elif RECURSIVE_SEARCH and os.path.isdir(file):
-      files += [os.path.join(file, f) for f in os.listdir(file)
+      items += [os.path.join(file, f) for f in os.listdir(file)
           if os.path.isfile(os.path.join(file, f))]
     else:
       fail("the file, '{}' doesn't exist".format(file))
@@ -629,7 +629,7 @@ try:
     elif screen == Screen.leave:
       window.clear()
       window.addstr(0, 0, "leaving a game...")
-      if GAME_MODE == M_FILES and len(files) == 0 \
+      if GAME_MODE == M_FILES and len(items) == 0 \
           or GAME_MODE == M_RSS and len(items) == 0 or TO_DEATH == True:
         window.addstr(1, 0, "press any key...")
         window.getch()
