@@ -405,7 +405,9 @@ class FeedItem(Resource):
     return self.title
 
   def get_content(self):
-    return self.content
+    return '# ' + item.get_title() + '\n' + re.sub(r'<[^<>]+>', '',
+        re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
+        self.content))
 
 
 # functions
@@ -429,9 +431,7 @@ def gen_text():
     return uni_to_ascii(item.get_content())
   elif GAME_MODE == M_RSS:
     item = items.popleft()
-    return uni_to_ascii('# ' + item.get_title() + '\n' + re.sub(r'<[^<>]+>', '',
-        re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
-        item.get_content())))
+    return uni_to_ascii(item.get_content())
   elif GAME_MODE == M_STDIN:
     return uni_to_ascii(stdin.readline())
   else:
