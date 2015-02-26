@@ -31,7 +31,7 @@ RESULT_SCREEN = True
 
 ## game modes
 M_FORTUNE = 0
-M_FILES = 1
+M_RESOURCES = 1
 M_RSS = 2
 M_STDIN = 3
 GAME_MODE = M_FORTUNE
@@ -331,7 +331,7 @@ class Boss(threading.Thread):
     else:
       while self.game.is_almost_over() \
           and (GAME_MODE == M_FORTUNE
-          or GAME_MODE == M_FILES and len(items) > 0
+          or GAME_MODE == M_RESOURCES and len(items) > 0
           or GAME_MODE == M_RSS and len(items) > 0):
         self.game.add_sample(gen_text())
 
@@ -345,7 +345,7 @@ class Screen(enum.Enum):
 
   @classmethod
   def go_to_next_game(cls):
-    if (GAME_MODE == M_RSS or GAME_MODE == M_FILES) and not TO_DEATH:
+    if (GAME_MODE == M_RSS or GAME_MODE == M_RESOURCES) and not TO_DEATH:
       return cls.menu
     else:
       return cls.game
@@ -426,7 +426,7 @@ def uni_to_ascii(text):
 def gen_text():
   if GAME_MODE == M_FORTUNE:
     return subprocess.check_output('fortune').decode('ascii')
-  elif GAME_MODE == M_FILES:
+  elif GAME_MODE == M_RESOURCES:
     item = items.popleft()
     return uni_to_ascii(item.get_content())
   elif GAME_MODE == M_RSS:
@@ -472,7 +472,7 @@ for option, value in opts:
   elif option == '-e':
     KEEP_EMPTY_LINES = False
   elif option == '-f':
-    GAME_MODE = M_FILES
+    GAME_MODE = M_RESOURCES
   elif option == '-l':
     if len(value) != 1:
       fail('the argument of -l option must be one character')
@@ -502,7 +502,7 @@ if not os.isatty(0):
   sys.stdin = open('/dev/tty', 'r')
   stdin = os.fdopen(3, 'r')
 
-if GAME_MODE == M_FILES and len(args) > 0:
+if GAME_MODE == M_RESOURCES and len(args) > 0:
   items = Resources([])
   for filename in args:
     if os.path.isfile(filename):
@@ -513,7 +513,7 @@ if GAME_MODE == M_FILES and len(args) > 0:
           items.append(LocalFile(file_in_dir))
     else:
       fail("the file, '{}' doesn't exist".format(filename))
-elif GAME_MODE == M_FILES and len(args) == 0:
+elif GAME_MODE == M_RESOURCES and len(args) == 0:
   fail('assign files as arguments to play in files mode')
 elif GAME_MODE == M_RSS and len(args) == 1:
   import feedparser
@@ -677,7 +677,7 @@ try:
     elif screen == Screen.leave:
       window.clear()
       window.addstr(0, 0, "leaving a game...")
-      if GAME_MODE == M_FILES and len(items) == 0 \
+      if GAME_MODE == M_RESOURCES and len(items) == 0 \
           or GAME_MODE == M_RSS and len(items) == 0 or TO_DEATH == True:
         window.addstr(1, 0, "press any key...")
         window.getch()
