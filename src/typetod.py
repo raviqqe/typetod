@@ -526,6 +526,7 @@ try:
 
     elif screen == Screen.menu: # only for rss mode
       window.clear()
+      window.refresh()
       pad = curses.newpad(len(items), window.getmaxyx()[1])
       pad.keypad(True)
       for i, item in enumerate(items):
