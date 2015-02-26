@@ -39,7 +39,7 @@ GAME_MODE = M_FORTUNE
 R_FORTUNE = 0
 R_FILES = 1
 R_RSS = 2
-RESOURCES = R_FILES
+RESOURCES = None
 
 ## min height and width of terminals
 MIN_HEIGHT = 8
@@ -505,32 +505,33 @@ if not os.isatty(0):
   sys.stdin = open('/dev/tty', 'r')
   stdin = os.fdopen(3, 'r')
 
-if RESOURCES == R_FILES and len(args) > 0:
-  items = Resources([])
-  for filename in args:
-    if os.path.isfile(filename):
-      items.append(LocalFile(filename))
-    elif RECURSIVE_SEARCH and os.path.isdir(filename):
-      for file_in_dir in os.listdir(filename):
-        if os.path.isfile(os.path.join(file_in_dir, f)):
-          items.append(LocalFile(file_in_dir))
-    else:
-      fail("the file, '{}' doesn't exist".format(filename))
-elif RESOURCES == R_FILES and len(args) == 0:
-  fail('assign files as arguments to play in files mode')
-elif RESOURCES == R_RSS and len(args) == 1:
-  import feedparser
-  print('downloading the rss feed from the url...')
-  feed = feedparser.parse(args[0])
-  if feed["bozo"] != 0:
-    fail('could not fetch rss feeds. check the url.')
-  if len(feed['items']) == 0:
-    fail('no item found in the rss feed')
-  items = Resources([])
-  for item in feed["items"]:
-    items.append(FeedItem(item['title'], item['summary']))
-elif RESOURCES == R_RSS:
-  fail('assign one url as an argument to play in rss mode')
+if GAME_MODE == M_RESOURCES:
+  if RESOURCES == R_FILES and len(args) > 0:
+    items = Resources([])
+    for filename in args:
+      if os.path.isfile(filename):
+        items.append(LocalFile(filename))
+      elif RECURSIVE_SEARCH and os.path.isdir(filename):
+        for file_in_dir in os.listdir(filename):
+          if os.path.isfile(os.path.join(file_in_dir, f)):
+            items.append(LocalFile(file_in_dir))
+      else:
+        fail("the file, '{}' doesn't exist".format(filename))
+  elif RESOURCES == R_FILES and len(args) == 0:
+    fail('assign files as arguments to play in files mode')
+  elif RESOURCES == R_RSS and len(args) == 1:
+    import feedparser
+    print('downloading the rss feed from the url...')
+    feed = feedparser.parse(args[0])
+    if feed["bozo"] != 0:
+      fail('could not fetch rss feeds. check the url.')
+    if len(feed['items']) == 0:
+      fail('no item found in the rss feed')
+    items = Resources([])
+    for item in feed["items"]:
+      items.append(FeedItem(item['title'], item['summary']))
+  elif RESOURCES == R_RSS:
+    fail('assign one url as an argument to play in rss mode')
 elif len(args) > 0:
   fail('the arguments are unnecessary in the game mode')
 
