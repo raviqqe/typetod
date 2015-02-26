@@ -362,6 +362,11 @@ class Screen(enum.Enum):
         window.addstr('y')
         return cls.go_to_next_game()
 
+class Resources(collections.deque):
+  def set_next(self, index):
+    self.appendleft(self[index])
+    del self[index + 1]
+
 class Resource(metaclass=abc.ABCMeta):
   @abc.abstractmethod
   def get_title(self):
@@ -424,9 +429,9 @@ def gen_text():
       return uni_to_ascii(file.read())
   elif GAME_MODE == M_RSS:
     item = items.popleft()
-    return uni_to_ascii('# ' + item["title"] + '\n' + re.sub(r'<[^<>]+>', '',
+    return uni_to_ascii('# ' + item.get_title() + '\n' + re.sub(r'<[^<>]+>', '',
         re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
-        item["summary"])))
+        item.get_content())))
   elif GAME_MODE == M_STDIN:
     return uni_to_ascii(stdin.readline())
   else:
@@ -498,7 +503,7 @@ if not os.isatty(0):
   stdin = os.fdopen(3, 'r')
 
 if GAME_MODE == M_FILES and len(args) > 0:
-  items = collections.deque([])
+  items = Resources([])
   for file in args:
     if os.path.isfile(file):
       items.append(file)
@@ -517,7 +522,9 @@ elif GAME_MODE == M_RSS and len(args) == 1:
     fail('could not fetch rss feeds. check the url.')
   if len(feed['items']) == 0:
     fail('no item found in the rss feed')
-  items = collections.deque(feed["items"])
+  items = Resources([])
+  for item in feed["items"]:
+    items.append(FeedItem(item['title'], item['summary']))
 elif GAME_MODE == M_RSS:
   fail('assign one url as an argument to play in rss mode')
 elif len(args) > 0:
@@ -569,9 +576,9 @@ try:
       pad = curses.newpad(len(items), window.getmaxyx()[1])
       pad.keypad(True)
       for i, item in enumerate(items):
-        pad.addstr(i, 0, '> ' + item['title']
-            if len(item['title']) + 2 < pad.getmaxyx()[1]
-            else '> ' + item['title'][:pad.getmaxyx()[1] - 6] + '...')
+        pad.addstr(i, 0, '> ' + item.get_title()
+            if len(item.get_title()) + 2 < pad.getmaxyx()[1]
+            else '> ' + item.get_title()[:pad.getmaxyx()[1] - 6] + '...')
       pad.move(0, 0)
       pad.refresh(0, 0, 0, 0, window.getmaxyx()[0] - 1,
           window.getmaxyx()[1] - 1)
@@ -582,8 +589,7 @@ try:
           screen = Screen.leave
           break
         elif char == curses.ascii.NL or char == ord(' '):
-          items.appendleft(items[pos])
-          del items[pos + 1]
+          items.set_next(pos)
           screen = Screen.game
           break
         elif char == ord('j') or char == curses.KEY_DOWN:
