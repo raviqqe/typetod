@@ -13,6 +13,7 @@ import signal
 import threading
 import getpass
 import enum
+import abc
 
 
 # global parameters
@@ -360,6 +361,46 @@ class Screen(enum.Enum):
       elif char == ord('y') or char == ord('Y') or char == curses.ascii.NL:
         window.addstr('y')
         return cls.go_to_next_game()
+
+class Resource(metaclass=abc.ABCMeta):
+  @abc.abstractmethod
+  def get_title(self):
+    """
+    Returns:
+      string: the title of resource printed in menu screen or somewhere.
+    """
+    return NotImplemented
+
+  @abc.abstractmethod
+  def get_content(self):
+    """
+    Returns:
+      string: the content of resource of self.name.
+        It returns self.content if it exists.
+    """
+    return NotImplemented
+
+class LocalFile(Resource):
+  def __init__(self, filename):
+    self.filename = filename
+
+  def get_title(self):
+    return self.filename
+
+  def get_content(self):
+    with open(self.filename, 'r') as fo:
+      return fo.read()
+
+class FeedItem(Resource):
+  def __init__(self, title, content):
+    self.title = title
+    self.content = content
+
+  def get_title(self):
+    return self.title
+
+  def get_content(self):
+    return self.content
 
 
 # functions
