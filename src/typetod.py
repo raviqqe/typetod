@@ -47,6 +47,7 @@ SPEED_UNIT = U_WPM
 ## translation table
 TRANS_TABLE = {
   ord(u'\xa0'): ' ',
+  ord(u'\xa3'): 'E',
   ord(u'\xe0'): 'a',
   ord(u'\xe1'): 'a',
   ord(u'\xe2'): 'a',
