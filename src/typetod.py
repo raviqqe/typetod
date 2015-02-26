@@ -425,8 +425,8 @@ def gen_text():
   if GAME_MODE == M_FORTUNE:
     return subprocess.check_output('fortune').decode('ascii')
   elif GAME_MODE == M_FILES:
-    with open(items.popleft(), 'r') as file:
-      return uni_to_ascii(file.read())
+    item = items.popleft()
+    return uni_to_ascii(item.get_content())
   elif GAME_MODE == M_RSS:
     item = items.popleft()
     return uni_to_ascii('# ' + item.get_title() + '\n' + re.sub(r'<[^<>]+>', '',
@@ -504,14 +504,15 @@ if not os.isatty(0):
 
 if GAME_MODE == M_FILES and len(args) > 0:
   items = Resources([])
-  for file in args:
-    if os.path.isfile(file):
-      items.append(file)
-    elif RECURSIVE_SEARCH and os.path.isdir(file):
-      items += [os.path.join(file, f) for f in os.listdir(file)
-          if os.path.isfile(os.path.join(file, f))]
+  for filename in args:
+    if os.path.isfile(filename):
+      items.append(LocalFile(filename))
+    elif RECURSIVE_SEARCH and os.path.isdir(filename):
+      for file_in_dir in os.listdir(filename):
+        if os.path.isfile(os.path.join(file_in_dir, f)):
+          items.append(LocalFile(file_in_dir))
     else:
-      fail("the file, '{}' doesn't exist".format(file))
+      fail("the file, '{}' doesn't exist".format(filename))
 elif GAME_MODE == M_FILES and len(args) == 0:
   fail('assign files as arguments to play in files mode')
 elif GAME_MODE == M_RSS and len(args) == 1:
