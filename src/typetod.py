@@ -32,9 +32,14 @@ RESULT_SCREEN = True
 ## game modes
 M_FORTUNE = 0
 M_RESOURCES = 1
-M_RSS = 2
 M_STDIN = 3
 GAME_MODE = M_FORTUNE
+
+## resources
+R_FORTUNE = 0
+R_FILES = 1
+R_RSS = 2
+RESOURCES = R_FILES
 
 ## min height and width of terminals
 MIN_HEIGHT = 8
@@ -331,8 +336,7 @@ class Boss(threading.Thread):
     else:
       while self.game.is_almost_over() \
           and (GAME_MODE == M_FORTUNE
-          or GAME_MODE == M_RESOURCES and len(items) > 0
-          or GAME_MODE == M_RSS and len(items) > 0):
+          or GAME_MODE == M_RESOURCES and len(items) > 0):
         self.game.add_sample(gen_text())
 
 class Screen(enum.Enum):
@@ -345,7 +349,7 @@ class Screen(enum.Enum):
 
   @classmethod
   def go_to_next_game(cls):
-    if (GAME_MODE == M_RSS or GAME_MODE == M_RESOURCES) and not TO_DEATH:
+    if GAME_MODE == M_RESOURCES and not TO_DEATH:
       return cls.menu
     else:
       return cls.game
@@ -405,7 +409,7 @@ class FeedItem(Resource):
     return self.title
 
   def get_content(self):
-    return '# ' + item.get_title() + '\n' + re.sub(r'<[^<>]+>', '',
+    return '# ' + self.get_title() + '\n' + re.sub(r'<[^<>]+>', '',
         re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
         self.content))
 
@@ -427,9 +431,6 @@ def gen_text():
   if GAME_MODE == M_FORTUNE:
     return subprocess.check_output('fortune').decode('ascii')
   elif GAME_MODE == M_RESOURCES:
-    item = items.popleft()
-    return uni_to_ascii(item.get_content())
-  elif GAME_MODE == M_RSS:
     item = items.popleft()
     return uni_to_ascii(item.get_content())
   elif GAME_MODE == M_STDIN:
@@ -473,6 +474,7 @@ for option, value in opts:
     KEEP_EMPTY_LINES = False
   elif option == '-f':
     GAME_MODE = M_RESOURCES
+    RESOURCES = R_FILES
   elif option == '-l':
     if len(value) != 1:
       fail('the argument of -l option must be one character')
@@ -492,7 +494,8 @@ for option, value in opts:
     else:
       fail('the argument of option, -e must be an integer')
   elif option == '-u':
-    GAME_MODE = M_RSS
+    GAME_MODE = M_RESOURCES
+    RESOURCES = R_RSS
 
 if not os.isatty(0):
   GAME_MODE = M_STDIN
@@ -502,7 +505,7 @@ if not os.isatty(0):
   sys.stdin = open('/dev/tty', 'r')
   stdin = os.fdopen(3, 'r')
 
-if GAME_MODE == M_RESOURCES and len(args) > 0:
+if RESOURCES == R_FILES and len(args) > 0:
   items = Resources([])
   for filename in args:
     if os.path.isfile(filename):
@@ -513,9 +516,9 @@ if GAME_MODE == M_RESOURCES and len(args) > 0:
           items.append(LocalFile(file_in_dir))
     else:
       fail("the file, '{}' doesn't exist".format(filename))
-elif GAME_MODE == M_RESOURCES and len(args) == 0:
+elif RESOURCES == R_FILES and len(args) == 0:
   fail('assign files as arguments to play in files mode')
-elif GAME_MODE == M_RSS and len(args) == 1:
+elif RESOURCES == R_RSS and len(args) == 1:
   import feedparser
   print('downloading the rss feed from the url...')
   feed = feedparser.parse(args[0])
@@ -526,7 +529,7 @@ elif GAME_MODE == M_RSS and len(args) == 1:
   items = Resources([])
   for item in feed["items"]:
     items.append(FeedItem(item['title'], item['summary']))
-elif GAME_MODE == M_RSS:
+elif RESOURCES == R_RSS:
   fail('assign one url as an argument to play in rss mode')
 elif len(args) > 0:
   fail('the arguments are unnecessary in the game mode')
@@ -677,8 +680,7 @@ try:
     elif screen == Screen.leave:
       window.clear()
       window.addstr(0, 0, "leaving a game...")
-      if GAME_MODE == M_RESOURCES and len(items) == 0 \
-          or GAME_MODE == M_RSS and len(items) == 0 or TO_DEATH == True:
+      if GAME_MODE == M_RESOURCES and len(items) == 0 or TO_DEATH == True:
         window.addstr(1, 0, "press any key...")
         window.getch()
         screen = Screen.exit
