@@ -13,6 +13,7 @@ import signal
 import threading
 import getpass
 import enum
+import abc
 
 
 # global parameters
@@ -30,10 +31,15 @@ RESULT_SCREEN = True
 
 ## game modes
 M_FORTUNE = 0
-M_FILES = 1
-M_RSS = 2
+M_RESOURCES = 1
 M_STDIN = 3
 GAME_MODE = M_FORTUNE
+
+## resources
+R_FORTUNE = 0
+R_FILES = 1
+R_RSS = 2
+RESOURCES = None
 
 ## min height and width of terminals
 MIN_HEIGHT = 8
@@ -331,8 +337,7 @@ class Boss(threading.Thread):
     else:
       while self.game.is_almost_over() \
           and (GAME_MODE == M_FORTUNE
-          or GAME_MODE == M_FILES and len(files) > 0
-          or GAME_MODE == M_RSS and len(items) > 0):
+          or GAME_MODE == M_RESOURCES and len(items) > 0):
         self.game.add_sample(gen_text())
 
 class Screen(enum.Enum):
@@ -345,7 +350,7 @@ class Screen(enum.Enum):
 
   @classmethod
   def go_to_next_game(cls):
-    if GAME_MODE == M_RSS and not TO_DEATH:
+    if GAME_MODE == M_RESOURCES and not TO_DEATH:
       return cls.menu
     else:
       return cls.game
@@ -361,6 +366,53 @@ class Screen(enum.Enum):
       elif char == ord('y') or char == ord('Y') or char == curses.ascii.NL:
         window.addstr('y')
         return cls.go_to_next_game()
+
+class Resources(collections.deque):
+  def set_next(self, index):
+    self.appendleft(self[index])
+    del self[index + 1]
+
+class Resource(metaclass=abc.ABCMeta):
+  @abc.abstractmethod
+  def get_title(self):
+    """
+    Returns:
+      string: the title of resource printed in menu screen or somewhere.
+    """
+    return NotImplemented
+
+  @abc.abstractmethod
+  def get_content(self):
+    """
+    Returns:
+      string: the content of resource of self.name.
+        It returns self.content if it exists.
+    """
+    return NotImplemented
+
+class LocalFile(Resource):
+  def __init__(self, filename):
+    self.filename = filename
+
+  def get_title(self):
+    return self.filename
+
+  def get_content(self):
+    with open(self.filename, 'r') as fo:
+      return fo.read()
+
+class FeedItem(Resource):
+  def __init__(self, title, content):
+    self.title = title
+    self.content = content
+
+  def get_title(self):
+    return self.title
+
+  def get_content(self):
+    return '# ' + self.get_title() + '\n' + re.sub(r'<[^<>]+>', '',
+        re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
+        self.content))
 
 
 # functions
@@ -379,14 +431,9 @@ def uni_to_ascii(text):
 def gen_text():
   if GAME_MODE == M_FORTUNE:
     return subprocess.check_output('fortune').decode('ascii')
-  elif GAME_MODE == M_FILES:
-    with open(files.popleft(), 'r') as file:
-      return uni_to_ascii(file.read())
-  elif GAME_MODE == M_RSS:
+  elif GAME_MODE == M_RESOURCES:
     item = items.popleft()
-    return uni_to_ascii('# ' + item["title"] + '\n' + re.sub(r'<[^<>]+>', '',
-        re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
-        item["summary"])))
+    return uni_to_ascii(item.get_content())
   elif GAME_MODE == M_STDIN:
     return uni_to_ascii(stdin.readline())
   else:
@@ -427,7 +474,8 @@ for option, value in opts:
   elif option == '-e':
     KEEP_EMPTY_LINES = False
   elif option == '-f':
-    GAME_MODE = M_FILES
+    GAME_MODE = M_RESOURCES
+    RESOURCES = R_FILES
   elif option == '-l':
     if len(value) != 1:
       fail('the argument of -l option must be one character')
@@ -447,7 +495,8 @@ for option, value in opts:
     else:
       fail('the argument of option, -e must be an integer')
   elif option == '-u':
-    GAME_MODE = M_RSS
+    GAME_MODE = M_RESOURCES
+    RESOURCES = R_RSS
 
 if not os.isatty(0):
   GAME_MODE = M_STDIN
@@ -457,29 +506,33 @@ if not os.isatty(0):
   sys.stdin = open('/dev/tty', 'r')
   stdin = os.fdopen(3, 'r')
 
-if GAME_MODE == M_FILES and len(args) > 0:
-  files = collections.deque([])
-  for file in args:
-    if os.path.isfile(file):
-      files.append(file)
-    elif RECURSIVE_SEARCH and os.path.isdir(file):
-      files += [os.path.join(file, f) for f in os.listdir(file)
-          if os.path.isfile(os.path.join(file, f))]
-    else:
-      fail("the file, '{}' doesn't exist".format(file))
-elif GAME_MODE == M_FILES and len(args) == 0:
-  fail('assign files as arguments to play in files mode')
-elif GAME_MODE == M_RSS and len(args) == 1:
-  import feedparser
-  print('downloading the rss feed from the url...')
-  feed = feedparser.parse(args[0])
-  if feed["bozo"] != 0:
-    fail('could not fetch rss feeds. check the url.')
-  if len(feed['items']) == 0:
-    fail('no item found in the rss feed')
-  items = collections.deque(feed["items"])
-elif GAME_MODE == M_RSS:
-  fail('assign one url as an argument to play in rss mode')
+if GAME_MODE == M_RESOURCES:
+  if RESOURCES == R_FILES and len(args) > 0:
+    items = Resources([])
+    for filename in args:
+      if os.path.isfile(filename):
+        items.append(LocalFile(filename))
+      elif RECURSIVE_SEARCH and os.path.isdir(filename):
+        for file_in_dir in os.listdir(filename):
+          if os.path.isfile(os.path.join(file_in_dir, f)):
+            items.append(LocalFile(file_in_dir))
+      else:
+        fail("the file, '{}' doesn't exist".format(filename))
+  elif RESOURCES == R_FILES and len(args) == 0:
+    fail('assign files as arguments to play in files mode')
+  elif RESOURCES == R_RSS and len(args) == 1:
+    import feedparser
+    print('downloading the rss feed from the url...')
+    feed = feedparser.parse(args[0])
+    if feed["bozo"] != 0:
+      fail('could not fetch rss feeds. check the url.')
+    if len(feed['items']) == 0:
+      fail('no item found in the rss feed')
+    items = Resources([])
+    for item in feed["items"]:
+      items.append(FeedItem(item['title'], item['summary']))
+  elif RESOURCES == R_RSS:
+    fail('assign one url as an argument to play in rss mode')
 elif len(args) > 0:
   fail('the arguments are unnecessary in the game mode')
 
@@ -530,9 +583,9 @@ try:
       pad = curses.newpad(len(items), window.getmaxyx()[1])
       pad.keypad(True)
       for i, item in enumerate(items):
-        pad.addstr(i, 0, '> ' + item['title']
-            if len(item['title']) + 2 < pad.getmaxyx()[1]
-            else '> ' + item['title'][:pad.getmaxyx()[1] - 6] + '...')
+        pad.addstr(i, 0, '> ' + item.get_title()
+            if len(item.get_title()) + 2 < pad.getmaxyx()[1]
+            else '> ' + item.get_title()[:pad.getmaxyx()[1] - 6] + '...')
       pad.move(0, 0)
       pad.refresh(0, 0, 0, 0, window.getmaxyx()[0] - 1,
           window.getmaxyx()[1] - 1)
@@ -543,8 +596,7 @@ try:
           screen = Screen.leave
           break
         elif char == curses.ascii.NL or char == ord(' '):
-          items.appendleft(items[pos])
-          del items[pos + 1]
+          items.set_next(pos)
           screen = Screen.game
           break
         elif char == ord('j') or char == curses.KEY_DOWN:
@@ -631,8 +683,7 @@ try:
     elif screen == Screen.leave:
       window.clear()
       window.addstr(0, 0, "leaving a game...")
-      if GAME_MODE == M_FILES and len(files) == 0 \
-          or GAME_MODE == M_RSS and len(items) == 0 or TO_DEATH == True:
+      if GAME_MODE == M_RESOURCES and len(items) == 0 or TO_DEATH == True:
         window.addstr(1, 0, "press any key...")
         window.getch()
         screen = Screen.exit
