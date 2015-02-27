@@ -526,7 +526,6 @@ if GAME_MODE == M_RESOURCES:
 elif GAME_MODE == M_STDIN and len(args) > 0:
   fail('any argument is unnecessary in stdin mode')
 
-## generate curses windows
 try:
   # CAUTION
   # use raise statement and FailException() to print error message instead of
