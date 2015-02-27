@@ -569,7 +569,7 @@ try:
         notebook.keypad(True)
         screen = Screen.go_to_next_game()
 
-    elif screen == Screen.menu: # only for rss mode
+    elif screen == Screen.menu: # for resources mode
       window.clear()
       window.refresh()
       pad = curses.newpad(len(items), window.getmaxyx()[1])
