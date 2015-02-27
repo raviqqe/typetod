@@ -387,13 +387,10 @@ class Item:
 
 class LocalFile(Item):
   def __init__(self, filename):
-    self.filename = filename
-
-  def get_title(self):
-    return self.filename
+    self.title = filename
 
   def get_content(self):
-    with open(self.filename, 'r') as fo:
+    with open(self.title, 'r') as fo:
       return fo.read()
 
 
