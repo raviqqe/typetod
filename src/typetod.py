@@ -291,7 +291,7 @@ class Game:
   def __format(self, text):
     t = []
     text = re.sub(r'^\n+', '', re.sub(r' +\n', r'\n',
-        re.sub(r'[ \n]+$', '', text.replace('\t', ' ' * TAB_SPACES))))
+        re.sub(r'[ \n]+$', '', conv_tabs(text))))
     if not KEEP_EMPTY_LINES:
       text = re.sub(r'\n+', r'\n', text)
     while len(text) > 0:
@@ -406,9 +406,12 @@ def fail(err_msg):
   perror(err_msg)
   exit(1)
 
+def conv_tabs(text):
+  return text.replace('\t', ' ' * TAB_SPACES)
+
 def fortune():
   text = subprocess.check_output('fortune').decode('ascii')
-  return Resource(text.split('\n', 1)[0], text)
+  return Resource(conv_tabs(text.split('\n', 1)[0]), text)
 
 def uni_to_ascii(text):
   return text.translate(TRANS_TABLE).encode('ascii',
