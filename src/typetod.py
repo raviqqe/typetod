@@ -364,17 +364,17 @@ class Screen(enum.Enum):
         window.addstr('y')
         return cls.go_to_next_game()
 
-class Resources(collections.deque):
+class Items(collections.deque):
   def set_next(self, index):
     self.appendleft(self[index])
     del self[index + 1]
 
-class Fortunes(Resources):
+class Fortunes(Items):
   def set_next(self, index):
     self.appendleft(self[index])
     self[index + 1] = fortune()
 
-class Resource:
+class Item:
   def __init__(self, title, content):
     self.title = title
     self.content = content
@@ -385,7 +385,7 @@ class Resource:
   def get_content(self):
     return self.content
 
-class LocalFile(Resource):
+class LocalFile(Item):
   def __init__(self, filename):
     self.filename = filename
 
@@ -411,7 +411,7 @@ def conv_tabs(text):
 
 def fortune():
   text = subprocess.check_output('fortune').decode('ascii')
-  return Resource(conv_tabs(text.split('\n', 1)[0]), text)
+  return Item(conv_tabs(text.split('\n', 1)[0]), text)
 
 def uni_to_ascii(text):
   return text.translate(TRANS_TABLE).encode('ascii',
@@ -500,7 +500,7 @@ if GAME_MODE == M_RESOURCES:
     for i in range(24):
       items.append(fortune())
   elif RESOURCES == R_FILES and len(args) > 0:
-    items = Resources([])
+    items = Items([])
     for filename in args:
       if os.path.isfile(filename):
         items.append(LocalFile(filename))
@@ -520,9 +520,9 @@ if GAME_MODE == M_RESOURCES:
       fail('could not fetch rss feeds. check the url.')
     if len(feed['items']) == 0:
       fail('no item found in the rss feed')
-    items = Resources([])
+    items = Items([])
     for item in feed["items"]:
-      items.append(Resource(item['title'], '# ' + item['title'] + '\n'
+      items.append(Item(item['title'], '# ' + item['title'] + '\n'
           + re.sub(r'<[^<>]+>', '',
           re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
           item['summary']))))
