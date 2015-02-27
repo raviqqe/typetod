@@ -457,7 +457,6 @@ for option, value in opts:
   elif option == '-e':
     KEEP_EMPTY_LINES = False
   elif option == '-f':
-    GAME_MODE = M_RESOURCES
     RESOURCES = R_FILES
   elif option == '-l':
     if len(value) != 1:
@@ -478,7 +477,6 @@ for option, value in opts:
     else:
       fail('the argument of option, -e must be an integer')
   elif option == '-u':
-    GAME_MODE = M_RESOURCES
     RESOURCES = R_RSS
 
 if not os.isatty(0):
