@@ -30,16 +30,15 @@ RECURSIVE_SEARCH = False
 RESULT_SCREEN = True
 
 ## game modes
-M_FORTUNE = 0
-M_RESOURCES = 1
-M_STDIN = 3
-GAME_MODE = M_FORTUNE
+M_RESOURCES = 0
+M_STDIN = 1
+GAME_MODE = M_RESOURCES
 
 ## resources
 R_FORTUNE = 0
 R_FILES = 1
 R_RSS = 2
-RESOURCES = None
+RESOURCES = R_FORTUNE
 
 ## min height and width of terminals
 MIN_HEIGHT = 8
@@ -334,10 +333,8 @@ class Boss(threading.Thread):
           self.game.add_sample(text)
         else:
           break
-    else:
-      while self.game.is_almost_over() \
-          and (GAME_MODE == M_FORTUNE
-          or GAME_MODE == M_RESOURCES and len(items) > 0):
+    elif GAME_MODE == M_RESOURCES:
+      while self.game.is_almost_over() and len(items) > 0:
         self.game.add_sample(gen_text())
 
 class Screen(enum.Enum):
@@ -372,23 +369,21 @@ class Resources(collections.deque):
     self.appendleft(self[index])
     del self[index + 1]
 
-class Resource(metaclass=abc.ABCMeta):
-  @abc.abstractmethod
-  def get_title(self):
-    """
-    Returns:
-      string: the title of resource printed in menu screen or somewhere.
-    """
-    return NotImplemented
+class Fortunes(Resources):
+  def set_next(self, index):
+    self.appendleft(self[index])
+    self[index + 1] = fortune()
 
-  @abc.abstractmethod
+class Resource:
+  def __init__(self, title, content):
+    self.title = title
+    self.content = content
+
+  def get_title(self):
+    return self.title
+
   def get_content(self):
-    """
-    Returns:
-      string: the content of resource of self.name.
-        It returns self.content if it exists.
-    """
-    return NotImplemented
+    return self.content
 
 class LocalFile(Resource):
   def __init__(self, filename):
@@ -401,19 +396,6 @@ class LocalFile(Resource):
     with open(self.filename, 'r') as fo:
       return fo.read()
 
-class FeedItem(Resource):
-  def __init__(self, title, content):
-    self.title = title
-    self.content = content
-
-  def get_title(self):
-    return self.title
-
-  def get_content(self):
-    return '# ' + self.get_title() + '\n' + re.sub(r'<[^<>]+>', '',
-        re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
-        self.content))
-
 
 # functions
 
@@ -424,16 +406,17 @@ def fail(err_msg):
   perror(err_msg)
   exit(1)
 
+def fortune():
+  text = subprocess.check_output('fortune').decode('ascii')
+  return Resource(text.split('\n', 1)[0], text)
+
 def uni_to_ascii(text):
   return text.translate(TRANS_TABLE).encode('ascii',
       errors='backslashreplace').decode('ascii')
 
 def gen_text():
-  if GAME_MODE == M_FORTUNE:
-    return subprocess.check_output('fortune').decode('ascii')
-  elif GAME_MODE == M_RESOURCES:
-    item = items.popleft()
-    return uni_to_ascii(item.get_content())
+  if GAME_MODE == M_RESOURCES:
+    return uni_to_ascii(items.popleft().get_content())
   elif GAME_MODE == M_STDIN:
     return uni_to_ascii(stdin.readline())
   else:
@@ -507,7 +490,13 @@ if not os.isatty(0):
   stdin = os.fdopen(3, 'r')
 
 if GAME_MODE == M_RESOURCES:
-  if RESOURCES == R_FILES and len(args) > 0:
+  if RESOURCES == R_FORTUNE and len(args) > 0:
+    fail('any argument is unnecessary in fortune mode')
+  elif RESOURCES == R_FORTUNE:
+    items = Fortunes([])
+    for i in range(24):
+      items.append(fortune())
+  elif RESOURCES == R_FILES and len(args) > 0:
     items = Resources([])
     for filename in args:
       if os.path.isfile(filename):
@@ -530,11 +519,14 @@ if GAME_MODE == M_RESOURCES:
       fail('no item found in the rss feed')
     items = Resources([])
     for item in feed["items"]:
-      items.append(FeedItem(item['title'], item['summary']))
+      items.append(Resource(item['title'], '# ' + item['title'] + '\n'
+          + re.sub(r'<[^<>]+>', '',
+          re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
+          item['summary']))))
   elif RESOURCES == R_RSS:
     fail('assign one url as an argument to play in rss mode')
-elif len(args) > 0:
-  fail('the arguments are unnecessary in the game mode')
+elif GAME_MODE == M_STDIN and len(args) > 0:
+  fail('any argument is unnecessary in stdin mode')
 
 ## generate curses windows
 try:
