@@ -13,6 +13,7 @@ import signal
 import threading
 import getpass
 import enum
+import urllib.request
 import abc
 
 
@@ -393,6 +394,14 @@ class LocalFile(Item):
     with open(self.title, 'r') as fo:
       return fo.read()
 
+class RemoteFile(Item):
+  def __init__(self, filename):
+    self.title = filename
+
+  def get_content(self):
+    with urllib.request.urlopen(self.title) as res:
+      return res.read().decode('utf-8', 'replace')
+
 
 # functions
 
@@ -421,6 +430,9 @@ def gen_text():
     return uni_to_ascii(stdin.readline())
   else:
     raise FailException('invalid GAME_MODE')
+
+def is_url(path):
+  return True if re.match(r'^[a-zA-Z0-9]+://', path) else False
 
 
 # main routine
@@ -503,6 +515,8 @@ if GAME_MODE == M_RESOURCES:
         for file_in_dir in os.listdir(filename):
           if os.path.isfile(os.path.join(file_in_dir, f)):
             items.append(LocalFile(file_in_dir))
+      elif is_url(filename):
+        items.append(RemoteFile(filename))
       else:
         fail("the file, '{}' doesn't exist".format(filename))
   elif RESOURCES == R_FILES and len(args) == 0:
