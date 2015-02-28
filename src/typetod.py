@@ -431,7 +431,6 @@ def is_url(path):
 
 
 # main routine
-err_msg = ''
 if not sys.stdout.isatty():
   fail('stdout is not a tty')
 
@@ -528,6 +527,7 @@ else:
   for i in range(24):
     items.append(fortune())
 
+err_msg = ''
 try:
   # CAUTION
   # use raise statement and FailException() to print error message instead of
