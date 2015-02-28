@@ -1,5 +1,5 @@
 # typetod
-typing game with endless mode written in python.
+##type anything forever
 Here is [its tarball](https://github.com/raviqqe/typetod/raw/master/pkg/typetod-0.01.tar.gz).
 And you can see [the videos on my website](http://www.raviqqe.com/typetod/).
 
