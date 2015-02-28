@@ -105,6 +105,7 @@ TRANS_TABLE = {
   ord(u'\uff5b'): '{',
   ord(u'\uff5c'): '|',
   ord(u'\uff5d'): '}',
+  ord(u'\ufffd'): '?',
 }
 
 
