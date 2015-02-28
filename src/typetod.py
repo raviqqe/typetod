@@ -23,7 +23,6 @@ A_CORRECT = curses.A_NORMAL
 A_ERROR = curses.A_REVERSE
 TAB_SPACES = 2
 STATUS_BAR = True
-SEP_LINE_CHAR = '-'
 MORPHING = False
 RECURSIVE_SEARCH = False
 RESULT_SCREEN = True
@@ -112,6 +111,7 @@ class FailException(Exception):
 class Game:
   SEPARATE_SAMPLES = True
   KEEP_EMPTY_LINES = True # in sample texts
+  SEP_LINE_CHAR = '-'
 
   def __init__(self, window):
     self.window = window
@@ -278,7 +278,7 @@ class Game:
         self.window.addstr(y, 0, self.sample_t[i])
     # display separation lines
     for y in self.sep_lines:
-      self.window.addstr(y, 0, SEP_LINE_CHAR * self.width)
+      self.window.addstr(y, 0, self.SEP_LINE_CHAR * self.width)
     self.window.move(self.input_line, 0)
  
   def __format(self, text):
@@ -469,7 +469,7 @@ for option, value in opts:
   elif option == '-l':
     if len(value) != 1:
       fail('the argument of -l option must be one character')
-    SEP_LINE_CHAR = value
+    Game.SEP_LINE_CHAR = value
   elif option == '-m':
     MORPHING = True
   elif option == '-q':
