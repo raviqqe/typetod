@@ -24,7 +24,6 @@ A_ERROR = curses.A_REVERSE
 TAB_SPACES = 2
 STATUS_BAR = True
 SEP_LINE_CHAR = '-'
-KEEP_EMPTY_LINES = True # in sample texts
 MORPHING = False
 RECURSIVE_SEARCH = False
 RESULT_SCREEN = True
@@ -121,6 +120,9 @@ class FailException(Exception):
 # classes
 
 class Game:
+  SEPARATE_SAMPLES = True
+  KEEP_EMPTY_LINES = True # in sample texts
+
   def __init__(self, window):
     self.window = window
     self.sample_t = collections.deque([])
@@ -170,12 +172,9 @@ class Game:
       return False
 
   def add_sample(self, text):
-    if GAME_MODE == M_STDIN and text == "\n":
+    if self.SEPARATE_SAMPLES and self.KEEP_EMPTY_LINES:
       self.sample_t += [""]
-    elif GAME_MODE != M_STDIN and KEEP_EMPTY_LINES and self.sample_t[-1] != "":
-      self.sample_t += [""] + self.__format(text)
-    else:
-      self.sample_t += self.__format(text)
+    self.sample_t += self.__format(text)
 
   def add_char(self, char):
     self.type_num += 1
@@ -292,7 +291,7 @@ class Game:
     t = []
     text = re.sub(r'^\n+', '', re.sub(r' +\n', r'\n',
         re.sub(r'[ \n]+$', '', conv_tabs(text))))
-    if not KEEP_EMPTY_LINES:
+    if not self.KEEP_EMPTY_LINES:
       text = re.sub(r'\n+', r'\n', text)
     while len(text) > 0:
       index = text.find('\n', 0, self.width)
@@ -312,7 +311,7 @@ class Game:
         else:
           t.append(text[:self.width])
           text = text[self.width:]
-    return t
+    return t if not (t == [] and self.KEEP_EMPTY_LINES) else ['']
 
 class Boss(threading.Thread):
   def __init__(self, game):
@@ -466,7 +465,7 @@ for option, value in opts:
   elif option == '-d':
     TO_DEATH = True
   elif option == '-e':
-    KEEP_EMPTY_LINES = False
+    Game.KEEP_EMPTY_LINES = False
   elif option == '-f':
     RESOURCES = R_FILES
   elif option == '-l':
@@ -493,6 +492,7 @@ for option, value in opts:
 if not os.isatty(0):
   GAME_MODE = M_STDIN
   TO_DEATH = True
+  Game.SEPARATE_SAMPLES = False
   os.dup2(0, 3)
   os.close(0)
   sys.stdin = open('/dev/tty', 'r')
