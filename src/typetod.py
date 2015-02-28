@@ -19,8 +19,6 @@ import urllib.request
 # global parameters
 
 ENDLESS = False
-A_CORRECT = curses.A_NORMAL
-A_ERROR = curses.A_REVERSE
 TAB_SPACES = 2
 STATUS_BAR = True
 MORPHING = False
@@ -112,6 +110,8 @@ class Game:
   SEPARATE_SAMPLES = True
   KEEP_EMPTY_LINES = True # in sample texts
   SEP_LINE_CHAR = '-'
+  A_CORRECT = curses.A_NORMAL
+  A_ERROR = curses.A_REVERSE
 
   def __init__(self, window):
     self.window = window
@@ -197,10 +197,10 @@ class Game:
     self.input_t += char
     if self.input_t[-1] \
         == self.sample_t[self.curr_sample_line][len(self.input_t) - 1]:
-      self.window.addstr(char, A_CORRECT)
+      self.window.addstr(char, self.A_CORRECT)
       return True
     else:
-      self.window.addstr(char, A_ERROR)
+      self.window.addstr(char, self.A_ERROR)
       return False
 
   def del_char(self):
@@ -445,15 +445,15 @@ rss_mode = False
 for option, value in opts:
   if option == '-a':
     if value == "reverse":
-      A_ERROR = curses.A_REVERSE
+      Game.A_ERROR = curses.A_REVERSE
     elif value == "blink":
-      A_ERROR = curses.A_BLINK
+      Game.A_ERROR = curses.A_BLINK
     elif value == "bold":
-      A_ERROR = curses.A_BOLD
+      Game.A_ERROR = curses.A_BOLD
     elif value == "underline":
-      A_ERROR = curses.A_UNDERLINE
+      Game.A_ERROR = curses.A_UNDERLINE
     elif value == "normal":
-      A_ERROR = curses.A_NORMAL
+      Game.A_ERROR = curses.A_NORMAL
     else:
       fail("the argument, '{}' of -a option is invalid\n"
           "valid arguments are 'reverse' (default), 'undreline', "
