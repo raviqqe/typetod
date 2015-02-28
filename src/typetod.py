@@ -518,7 +518,7 @@ elif len(args) > 0:
       for file_in_dir in os.listdir(filename):
         if os.path.isfile(os.path.join(file_in_dir, f)):
           items.append(LocalFile(file_in_dir))
-    elif re.match(r'^[a-zA-Z0-9]+://', filename):
+    elif re.match(r'^http://', filename):
       items.append(RemoteFile(filename))
     else:
       fail("the file, '{}' doesn't exist".format(filename))
