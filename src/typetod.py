@@ -522,8 +522,11 @@ elif len(args) > 0:
           items.append(LocalFile(file_in_dir))
     else:
       url = urllib.parse.urlparse(filename)
-      if url.scheme == 'http':
-        conn = http.client.HTTPConnection(url.netloc)
+      if url.scheme == 'http' or url.scheme == 'https':
+        if url.scheme == 'http':
+          conn = http.client.HTTPConnection(url.netloc)
+        elif url.scheme == 'https':
+          conn = http.client.HTTPSConnection(url.netloc)
         conn.request('HEAD', url.path)
         status = conn.getresponse().status
         conn.close()
