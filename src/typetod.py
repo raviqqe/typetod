@@ -18,7 +18,7 @@ import urllib.request
 
 # global parameters
 
-TO_DEATH = False # endless mode or not
+ENDLESS = False
 A_CORRECT = curses.A_NORMAL
 A_ERROR = curses.A_REVERSE
 TAB_SPACES = 2
@@ -332,7 +332,7 @@ class Screen(enum.Enum):
 
   @classmethod
   def go_to_next_game(cls):
-    if not TO_DEATH:
+    if not ENDLESS:
       return cls.menu
     else:
       return cls.game
@@ -461,7 +461,7 @@ for option, value in opts:
   elif option == '-c':
     SPEED_UNIT = U_CPS
   elif option == '-d':
-    TO_DEATH = True
+    ENDLESS = True
   elif option == '-e':
     Game.KEEP_EMPTY_LINES = False
   elif option == '-f':
@@ -486,7 +486,7 @@ for option, value in opts:
       fail('the argument of option, -e must be an integer')
 
 if not os.isatty(0) and len(args) == 0:
-  TO_DEATH = True
+  ENDLESS = True
   Game.SEPARATE_SAMPLES = False
   os.dup2(0, 3)
   os.close(0)
@@ -610,7 +610,7 @@ try:
     elif screen == Screen.game:
       game = Game(notebook)
       game.add_sample(gen_text())
-      if TO_DEATH == True:
+      if ENDLESS:
         boss = Boss(game)
         boss.daemon = True
         boss.assign_tasks()
@@ -632,7 +632,7 @@ try:
       while not game.is_over():
         char = notebook.getch()
         if char == curses.ascii.ESC or char == 5: # 5 is ctrl + 'e'
-          if TO_DEATH and RESULT_SCREEN:
+          if ENDLESS and RESULT_SCREEN:
             game.save_result()
             screen = Screen.result
           else:
@@ -657,7 +657,7 @@ try:
 
     elif screen == Screen.result:
       window.clear()
-      if TO_DEATH:
+      if ENDLESS:
         window.addstr(0, 0, "you survived!")
       else:
         window.addstr(0, 0, "you did it!")
@@ -674,7 +674,7 @@ try:
     elif screen == Screen.leave:
       window.clear()
       window.addstr(0, 0, "leaving a game...")
-      if not items.is_left() or TO_DEATH == True:
+      if not items.is_left() or ENDLESS:
         window.addstr(1, 0, "press any key...")
         window.getch()
         screen = Screen.exit
