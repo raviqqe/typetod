@@ -169,7 +169,7 @@ class Game:
       self.sample_t += [""]
     elif self.first_sample:
       self.first_sample = False
-    self.sample_t += self.__format(text)
+    self.sample_t += self.__format(uni_to_ascii(text))
 
   def add_char(self, char):
     self.type_num += 1
@@ -324,7 +324,7 @@ class Boss(threading.Thread):
 
   def assign_tasks(self):
     while self.game.is_almost_over() and items.is_left():
-      self.game.add_sample(gen_text())
+      self.game.add_sample(items.popleft().get_content())
 
 class Screen(enum.Enum):
   hello = 0
@@ -426,9 +426,6 @@ def fortune():
 def uni_to_ascii(text):
   return text.translate(TRANS_TABLE).encode('ascii',
       errors='backslashreplace').decode('ascii')
-
-def gen_text():
-  return uni_to_ascii(items.popleft().get_content())
 
 
 # main routine
@@ -613,7 +610,7 @@ try:
   
     elif screen == Screen.game:
       game = Game(notebook)
-      game.add_sample(gen_text())
+      game.add_sample(items.popleft().get_content())
       if ENDLESS:
         boss = Boss(game)
         boss.daemon = True
