@@ -28,13 +28,6 @@ MORPHING = False
 RECURSIVE_SEARCH = False
 RESULT_SCREEN = True
 
-## game modes
-## resources
-R_FORTUNE = 0
-R_FILES = 1
-R_RSS = 2
-RESOURCES = R_FORTUNE
-
 ## min height and width of terminals
 MIN_HEIGHT = 8
 MIN_WIDTH = 40
@@ -447,6 +440,7 @@ try:
 except getopt.GetoptError as err:
   fail(str(err))
 
+rss_mode = False
 for option, value in opts:
   if option == '-a':
     if value == "reverse":
@@ -470,7 +464,7 @@ for option, value in opts:
   elif option == '-e':
     Game.KEEP_EMPTY_LINES = False
   elif option == '-f':
-    RESOURCES = R_FILES
+    rss_mode = True
   elif option == '-l':
     if len(value) != 1:
       fail('the argument of -l option must be one character')
@@ -489,8 +483,6 @@ for option, value in opts:
       TAB_SPACES = int(value)
     else:
       fail('the argument of option, -e must be an integer')
-  elif option == '-u':
-    RESOURCES = R_RSS
 
 if not os.isatty(0) and len(args) == 0:
   TO_DEATH = True
@@ -501,28 +493,7 @@ if not os.isatty(0) and len(args) == 0:
   items = Stdin(os.fdopen(3, 'r'))
 elif not os.isatty(0):
   fail('no argument is needed in stdin mode')
-elif RESOURCES == R_FORTUNE and len(args) == 0:
-  items = Fortunes([])
-  for i in range(24):
-    items.append(fortune())
-elif RESOURCES == R_FORTUNE:
-  fail('no argument is needed in fortune mode')
-elif RESOURCES == R_FILES and len(args) > 0:
-  items = Items([])
-  for filename in args:
-    if os.path.isfile(filename):
-      items.append(LocalFile(filename))
-    elif RECURSIVE_SEARCH and os.path.isdir(filename):
-      for file_in_dir in os.listdir(filename):
-        if os.path.isfile(os.path.join(file_in_dir, f)):
-          items.append(LocalFile(file_in_dir))
-    elif is_url(filename):
-      items.append(RemoteFile(filename))
-    else:
-      fail("the file, '{}' doesn't exist".format(filename))
-elif RESOURCES == R_FILES:
-  fail('assign files as arguments to play in files mode')
-elif RESOURCES == R_RSS and len(args) == 1:
+elif rss_mode and len(args) == 1:
   import feedparser
   print('downloading the rss feed from the url...')
   feed = feedparser.parse(args[0])
@@ -536,8 +507,25 @@ elif RESOURCES == R_RSS and len(args) == 1:
         + re.sub(r'<[^<>]+>', '',
         re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
         item['summary']))))
-elif RESOURCES == R_RSS:
+elif rss_mode:
   fail('assign one url as an argument to play in rss mode')
+elif len(args) > 0:
+  items = Items([])
+  for filename in args:
+    if os.path.isfile(filename):
+      items.append(LocalFile(filename))
+    elif RECURSIVE_SEARCH and os.path.isdir(filename):
+      for file_in_dir in os.listdir(filename):
+        if os.path.isfile(os.path.join(file_in_dir, f)):
+          items.append(LocalFile(file_in_dir))
+    elif is_url(filename):
+      items.append(RemoteFile(filename))
+    else:
+      fail("the file, '{}' doesn't exist".format(filename))
+else:
+  items = Fortunes([])
+  for i in range(24):
+    items.append(fortune())
 
 try:
   # CAUTION
