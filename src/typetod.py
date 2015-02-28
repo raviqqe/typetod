@@ -21,7 +21,6 @@ import urllib.request
 ENDLESS = False
 TAB_SPACES = 2
 STATUS_BAR = True
-MORPHING = False
 RECURSIVE_SEARCH = False
 RESULT_SCREEN = True
 
@@ -112,6 +111,7 @@ class Game:
   SEP_LINE_CHAR = '-'
   A_CORRECT = curses.A_NORMAL
   A_ERROR = curses.A_REVERSE
+  MORPHING = False
 
   def __init__(self, window):
     self.window = window
@@ -188,7 +188,7 @@ class Game:
           break
     elif not self.__add_char(char):
       self.error_num += 1
-    if MORPHING:
+    if self.MORPHING:
       self.__morph()
     if self.is_over():
       self.save_result()
@@ -208,11 +208,11 @@ class Game:
       self.input_t = self.input_t[:-1]
       self.window.move(self.input_line, len(self.input_t))
       self.window.clrtoeol()
-    if MORPHING:
+    if self.MORPHING:
       self.__morph()
 
   def clear_input_line(self):
-    if MORPHING:
+    if self.MORPHING:
       self.window.addstr(self.input_line - 1, 0,
           self.sample_t[self.curr_sample_line])
     self.input_t = '' 
@@ -471,7 +471,7 @@ for option, value in opts:
       fail('the argument of -l option must be one character')
     Game.SEP_LINE_CHAR = value
   elif option == '-m':
-    MORPHING = True
+    Game.MORPHING = True
   elif option == '-q':
     RESULT_SCREEN = False
     STATUS_BAR = False
