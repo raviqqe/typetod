@@ -266,6 +266,9 @@ class Game:
   def get_errors(self):
     return '{:>3d}'.format(self.error_num)
 
+  def typed(self):
+    return self.type_num > 0
+
   def __new_line(self):
     self.input_t = ""
     self.sample_t.popleft()
@@ -636,7 +639,7 @@ try:
       while not game.is_over():
         char = notebook.getch()
         if char == curses.ascii.ESC or char == 5: # 5 is ctrl + 'e'
-          if ENDLESS and RESULT_SCREEN:
+          if ENDLESS and RESULT_SCREEN and game.typed():
             game.save_result()
             screen = Screen.result
           else:
