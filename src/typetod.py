@@ -23,6 +23,7 @@ TAB_SPACES = 2
 STATUS_BAR = True
 RECURSIVE_SEARCH = False
 RESULT_SCREEN = True
+MENU_SCREEN = True
 
 ## min height and width of terminals
 MIN_HEIGHT = 8
@@ -332,7 +333,7 @@ class Screen(enum.Enum):
 
   @classmethod
   def go_to_next_game(cls):
-    if not ENDLESS:
+    if MENU_SCREEN and not ENDLESS:
       return cls.menu
     else:
       return cls.game
@@ -436,7 +437,7 @@ if not sys.stdout.isatty():
 
 ## parse command line arguments
 try:
-  opts, args = getopt.getopt(sys.argv[1:], 'a:cdefl:mqrst:u')
+  opts, args = getopt.getopt(sys.argv[1:], 'a:cdefl:mnqrst:')
 except getopt.GetoptError as err:
   fail(str(err))
 
@@ -470,6 +471,8 @@ for option, value in opts:
       fail('the argument of -l option must be one character')
     Game.SEP_LINE_CHAR = value
   elif option == '-m':
+    MENU_SCREEN = not MENU_SCREEN
+  elif option == '-n':
     Game.MORPHING = True
   elif option == '-q':
     RESULT_SCREEN = False
@@ -523,6 +526,7 @@ elif len(args) > 0:
     else:
       fail("the file, '{}' doesn't exist".format(filename))
 else:
+  MENU_SCREEN = not MENU_SCREEN
   items = Fortunes([])
   for i in range(24):
     items.append(fortune())

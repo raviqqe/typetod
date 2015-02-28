@@ -1,5 +1,4 @@
 # todo list
 * option to convert multiple space to one space in sample text
-* no-menu option
 * don't erase sep lines when redrawing screen
 * skip result screen when a user types nothing
