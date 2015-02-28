@@ -24,21 +24,9 @@ A_ERROR = curses.A_REVERSE
 TAB_SPACES = 2
 STATUS_BAR = True
 SEP_LINE_CHAR = '-'
-KEEP_EMPTY_LINES = True # in sample texts
 MORPHING = False
 RECURSIVE_SEARCH = False
 RESULT_SCREEN = True
-
-## game modes
-M_RESOURCES = 0
-M_STDIN = 1
-GAME_MODE = M_RESOURCES
-
-## resources
-R_FORTUNE = 0
-R_FILES = 1
-R_RSS = 2
-RESOURCES = R_FORTUNE
 
 ## min height and width of terminals
 MIN_HEIGHT = 8
@@ -122,6 +110,9 @@ class FailException(Exception):
 # classes
 
 class Game:
+  SEPARATE_SAMPLES = True
+  KEEP_EMPTY_LINES = True # in sample texts
+
   def __init__(self, window):
     self.window = window
     self.sample_t = collections.deque([])
@@ -150,6 +141,7 @@ class Game:
         self.sample_lines.append(y)
     for i in range(self.curr_sample_line + 1):
       self.sample_t.append("")
+    self.first_sample = True
 
   def start(self):
     self.__new_line()
@@ -171,12 +163,12 @@ class Game:
       return False
 
   def add_sample(self, text):
-    if GAME_MODE == M_STDIN and text == "\n":
+    if self.SEPARATE_SAMPLES and self.KEEP_EMPTY_LINES \
+        and not self.first_sample:
       self.sample_t += [""]
-    elif GAME_MODE != M_STDIN and KEEP_EMPTY_LINES and self.sample_t[-1] != "":
-      self.sample_t += [""] + self.__format(text)
-    else:
-      self.sample_t += self.__format(text)
+    elif self.first_sample:
+      self.first_sample = False
+    self.sample_t += self.__format(text)
 
   def add_char(self, char):
     self.type_num += 1
@@ -293,7 +285,7 @@ class Game:
     t = []
     text = re.sub(r'^\n+', '', re.sub(r' +\n', r'\n',
         re.sub(r'[ \n]+$', '', conv_tabs(text))))
-    if not KEEP_EMPTY_LINES:
+    if not self.KEEP_EMPTY_LINES:
       text = re.sub(r'\n+', r'\n', text)
     while len(text) > 0:
       index = text.find('\n', 0, self.width)
@@ -313,7 +305,7 @@ class Game:
         else:
           t.append(text[:self.width])
           text = text[self.width:]
-    return t
+    return t if not (t == [] and self.KEEP_EMPTY_LINES) else ['']
 
 class Boss(threading.Thread):
   def __init__(self, game):
@@ -327,16 +319,8 @@ class Boss(threading.Thread):
       # 80[char] / (200[wpm] * 5[char/word] / 60[s/m]) = 4.8[s]
 
   def assign_tasks(self):
-    if GAME_MODE == M_STDIN:
-      while self.game.is_almost_over():
-        text = gen_text()
-        if text != '':
-          self.game.add_sample(text)
-        else:
-          break
-    elif GAME_MODE == M_RESOURCES:
-      while self.game.is_almost_over() and len(items) > 0:
-        self.game.add_sample(gen_text())
+    while self.game.is_almost_over() and items.is_left():
+      self.game.add_sample(gen_text())
 
 class Screen(enum.Enum):
   hello = 0
@@ -348,7 +332,7 @@ class Screen(enum.Enum):
 
   @classmethod
   def go_to_next_game(cls):
-    if GAME_MODE == M_RESOURCES and not TO_DEATH:
+    if not TO_DEATH:
       return cls.menu
     else:
       return cls.game
@@ -370,10 +354,26 @@ class Items(collections.deque):
     self.appendleft(self[index])
     del self[index + 1]
 
+  def is_left(self):
+    return bool(len(self))
+
 class Fortunes(Items):
   def set_next(self, index):
     self.appendleft(self[index])
     self[index + 1] = fortune()
+
+class Stdin(Items):
+  def __init__(self, fo):
+    self.stdin = fo
+    self.buffer = self.stdin.readline()
+
+  def popleft(self):
+    tmp = self.buffer
+    self.buffer = self.stdin.readline()
+    return Item(tmp, tmp)
+
+  def is_left(self):
+    return bool(self.buffer)
 
 class Item:
   def __init__(self, title, content):
@@ -424,12 +424,7 @@ def uni_to_ascii(text):
       errors='backslashreplace').decode('ascii')
 
 def gen_text():
-  if GAME_MODE == M_RESOURCES:
-    return uni_to_ascii(items.popleft().get_content())
-  elif GAME_MODE == M_STDIN:
-    return uni_to_ascii(stdin.readline())
-  else:
-    raise FailException('invalid GAME_MODE')
+  return uni_to_ascii(items.popleft().get_content())
 
 def is_url(path):
   return True if re.match(r'^[a-zA-Z0-9]+://', path) else False
@@ -446,6 +441,7 @@ try:
 except getopt.GetoptError as err:
   fail(str(err))
 
+rss_mode = False
 for option, value in opts:
   if option == '-a':
     if value == "reverse":
@@ -467,9 +463,9 @@ for option, value in opts:
   elif option == '-d':
     TO_DEATH = True
   elif option == '-e':
-    KEEP_EMPTY_LINES = False
+    Game.KEEP_EMPTY_LINES = False
   elif option == '-f':
-    RESOURCES = R_FILES
+    rss_mode = True
   elif option == '-l':
     if len(value) != 1:
       fail('the argument of -l option must be one character')
@@ -488,57 +484,49 @@ for option, value in opts:
       TAB_SPACES = int(value)
     else:
       fail('the argument of option, -e must be an integer')
-  elif option == '-u':
-    RESOURCES = R_RSS
 
-if not os.isatty(0):
-  GAME_MODE = M_STDIN
+if not os.isatty(0) and len(args) == 0:
   TO_DEATH = True
+  Game.SEPARATE_SAMPLES = False
   os.dup2(0, 3)
   os.close(0)
   sys.stdin = open('/dev/tty', 'r')
-  stdin = os.fdopen(3, 'r')
-
-if GAME_MODE == M_RESOURCES:
-  if RESOURCES == R_FORTUNE and len(args) > 0:
-    fail('any argument is unnecessary in fortune mode')
-  elif RESOURCES == R_FORTUNE:
-    items = Fortunes([])
-    for i in range(24):
-      items.append(fortune())
-  elif RESOURCES == R_FILES and len(args) > 0:
-    items = Items([])
-    for filename in args:
-      if os.path.isfile(filename):
-        items.append(LocalFile(filename))
-      elif RECURSIVE_SEARCH and os.path.isdir(filename):
-        for file_in_dir in os.listdir(filename):
-          if os.path.isfile(os.path.join(file_in_dir, f)):
-            items.append(LocalFile(file_in_dir))
-      elif is_url(filename):
-        items.append(RemoteFile(filename))
-      else:
-        fail("the file, '{}' doesn't exist".format(filename))
-  elif RESOURCES == R_FILES and len(args) == 0:
-    fail('assign files as arguments to play in files mode')
-  elif RESOURCES == R_RSS and len(args) == 1:
-    import feedparser
-    print('downloading the rss feed from the url...')
-    feed = feedparser.parse(args[0])
-    if feed["bozo"] != 0:
-      fail('could not fetch rss feeds. check the url.')
-    if len(feed['items']) == 0:
-      fail('no item found in the rss feed')
-    items = Items([])
-    for item in feed["items"]:
-      items.append(Item(item['title'], '# ' + item['title'] + '\n'
-          + re.sub(r'<[^<>]+>', '',
-          re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
-          item['summary']))))
-  elif RESOURCES == R_RSS:
-    fail('assign one url as an argument to play in rss mode')
-elif GAME_MODE == M_STDIN and len(args) > 0:
-  fail('any argument is unnecessary in stdin mode')
+  items = Stdin(os.fdopen(3, 'r'))
+elif not os.isatty(0):
+  fail('no argument is needed in stdin mode')
+elif rss_mode and len(args) == 1:
+  import feedparser
+  print('downloading the rss feed from the url...')
+  feed = feedparser.parse(args[0])
+  if feed["bozo"] != 0:
+    fail('could not fetch rss feeds. check the url.')
+  if len(feed['items']) == 0:
+    fail('no item found in the rss feed')
+  items = Items([])
+  for item in feed["items"]:
+    items.append(Item(item['title'], '# ' + item['title'] + '\n'
+        + re.sub(r'<[^<>]+>', '',
+        re.sub(r'\s*</\s*p\s*>\s*<\s*p([^>]|(".*")|(\'.*\'))*>\s*', '\n\n',
+        item['summary']))))
+elif rss_mode:
+  fail('assign one url as an argument to play in rss mode')
+elif len(args) > 0:
+  items = Items([])
+  for filename in args:
+    if os.path.isfile(filename):
+      items.append(LocalFile(filename))
+    elif RECURSIVE_SEARCH and os.path.isdir(filename):
+      for file_in_dir in os.listdir(filename):
+        if os.path.isfile(os.path.join(file_in_dir, f)):
+          items.append(LocalFile(file_in_dir))
+    elif is_url(filename):
+      items.append(RemoteFile(filename))
+    else:
+      fail("the file, '{}' doesn't exist".format(filename))
+else:
+  items = Fortunes([])
+  for i in range(24):
+    items.append(fortune())
 
 try:
   # CAUTION
@@ -686,7 +674,7 @@ try:
     elif screen == Screen.leave:
       window.clear()
       window.addstr(0, 0, "leaving a game...")
-      if GAME_MODE == M_RESOURCES and len(items) == 0 or TO_DEATH == True:
+      if not items.is_left() or TO_DEATH == True:
         window.addstr(1, 0, "press any key...")
         window.getch()
         screen = Screen.exit
