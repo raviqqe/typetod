@@ -14,6 +14,8 @@ import threading
 import getpass
 import enum
 import urllib.request
+import urllib.parse
+import http.client
 
 
 # global parameters
@@ -399,8 +401,8 @@ class LocalFile(Item):
       return fo.read()
 
 class RemoteFile(Item):
-  def __init__(self, filename):
-    self.title = filename
+  def __init__(self, url):
+    self.title = url
 
   def get_content(self):
     with urllib.request.urlopen(self.title) as res:
@@ -514,14 +516,23 @@ elif len(args) > 0:
   for filename in args:
     if os.path.isfile(filename):
       items.append(LocalFile(filename))
-    elif RECURSIVE_SEARCH and os.path.isdir(filename):
+    elif os.path.isdir(filename) and RECURSIVE_SEARCH:
       for file_in_dir in os.listdir(filename):
         if os.path.isfile(os.path.join(file_in_dir, f)):
           items.append(LocalFile(file_in_dir))
-    elif re.match(r'^http://', filename):
-      items.append(RemoteFile(filename))
     else:
-      fail("the file, '{}' doesn't exist".format(filename))
+      url = urllib.parse.urlparse(filename)
+      if url.scheme == 'http':
+        conn = http.client.HTTPConnection(url.netloc)
+        conn.request('HEAD', url.path)
+        status = conn.getresponse().status
+        conn.close()
+        if status < 400:
+          items.append(RemoteFile(filename))
+        else:
+          fail("url, {} is invalid".format(filename))
+      else:
+        fail("resource, '{}' doesn't exist or invalid".format(filename))
 else:
   MENU_SCREEN = not MENU_SCREEN
   items = Fortunes([])
