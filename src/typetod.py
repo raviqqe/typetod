@@ -430,9 +430,6 @@ def uni_to_ascii(text):
 def gen_text():
   return uni_to_ascii(items.popleft().get_content())
 
-def is_url(path):
-  return True if re.match(r'^[a-zA-Z0-9]+://', path) else False
-
 
 # main routine
 if not sys.stdout.isatty():
@@ -524,7 +521,7 @@ elif len(args) > 0:
       for file_in_dir in os.listdir(filename):
         if os.path.isfile(os.path.join(file_in_dir, f)):
           items.append(LocalFile(file_in_dir))
-    elif is_url(filename):
+    elif re.match(r'^[a-zA-Z0-9]+://', filename):
       items.append(RemoteFile(filename))
     else:
       fail("the file, '{}' doesn't exist".format(filename))
