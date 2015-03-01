@@ -1,7 +1,7 @@
 # Maintainer: raviqqe <raviqqe@gmail.com>
 pkgname=typetod
 pkgver=0.02
-pkgrel=1
+pkgrel=2
 pkgdesc="typing game to let you type anything forever"
 arch=('any')
 url="https://github.com/raviqqe/typetod"
