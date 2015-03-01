@@ -545,7 +545,7 @@ elif len(args) > 0:
           if status < 400:
             items.append(RemoteFile(filename))
           else:
-            invalid_url(filename)
+            raise
         except:
           invalid_url(filename)
       elif url.scheme:
