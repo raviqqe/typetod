@@ -16,6 +16,7 @@ import enum
 import urllib.request
 import urllib.parse
 import http.client
+import ftplib
 
 
 # global parameters
@@ -409,7 +410,7 @@ class RemoteFile(Item):
 
   def get_content(self):
     with urllib.request.urlopen(self.title) as res:
-      return res.read().decode('utf-8', 'replace')
+      return res.read().decode('utf-8', 'replace').replace('\r', '')
 
 
 # functions
@@ -548,8 +549,20 @@ elif len(args) > 0:
             raise
         except:
           invalid_url(filename)
+      elif url.scheme == 'ftp' and len(url.path) == 0:
+        fail('file path is needed in url with ftp protocol')
+      elif url.scheme == 'ftp':
+        try:
+          with ftplib.FTP(url.netloc) as conn:
+            conn.login()
+            if url.path in conn.nlst(os.path.dirname(url.path)):
+              items.append(RemoteFile(filename))
+            else:
+              raise
+        except:
+          invalid_url(filename)
       elif url.scheme:
-        invalid_url(filename)
+        fail("invalid scheme, {} of uri, {}".format(url.scheme, filename))
       else:
         fail("file, '{}' doesn't exist".format(filename))
       signal.setitimer(signal.ITIMER_REAL, 0)
