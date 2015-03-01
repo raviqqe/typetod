@@ -432,8 +432,12 @@ def fortune():
   return Item(conv_tabs(text.split('\n', 1)[0]), text)
 
 def uni_to_ascii(text):
-  return text.translate(TRANS_TABLE).encode('ascii',
-      errors='backslashreplace').decode('ascii')
+  try:
+    import unidecode
+    return unidecode.unidecode(text)
+  except ImportError:
+    return text.translate(TRANS_TABLE).encode('ascii',
+        errors='backslashreplace').decode('ascii')
 
 
 # main routine
