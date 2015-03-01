@@ -378,9 +378,8 @@ class Stdin(Items):
     self.buffer = self.stdin.readline()
 
   def popleft(self):
-    tmp = self.buffer
-    self.buffer = self.stdin.readline()
-    return Item(tmp, tmp)
+    tmp, self.buffer = self.buffer, self.stdin.readline()
+    return Item('', tmp)
 
   def is_left(self):
     return bool(self.buffer)
