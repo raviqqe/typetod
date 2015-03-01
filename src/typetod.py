@@ -368,9 +368,9 @@ class Items(collections.deque):
     return bool(len(self))
 
 class Fortunes(Items):
-  def set_next(self, index):
-    self.appendleft(self[index])
-    self[index + 1] = fortune()
+  def popleft(self):
+    self.append(fortune())
+    return super(self.__class__, self).popleft()
 
 class Stdin(Items):
   def __init__(self, fo):
