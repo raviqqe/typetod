@@ -618,8 +618,8 @@ try:
       pad = curses.newpad(len(items), window.getmaxyx()[1])
       pad.keypad(True)
       for i, item in enumerate(items):
-        pad.addstr(i, 0, '> ' + item.get_title()
-            if len(item.get_title()) + 2 < pad.getmaxyx()[1]
+        pad.addstr(i, 0, '> ' + uni_to_ascii(item.get_title())
+            if len(uni_to_ascii(item.get_title())) + 2 < pad.getmaxyx()[1]
             else '> ' + item.get_title()[:pad.getmaxyx()[1] - 6] + '...')
       pad.move(0, 0)
       pad.refresh(0, 0, 0, 0, window.getmaxyx()[0] - 1,
