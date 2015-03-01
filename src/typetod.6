@@ -1,6 +1,6 @@
 .TH TYPETOD 6 typetod\-VERSION
 .SH NAME
-typetod \- typing game with endless mode
+typetod \- type everything forever
 .SH SYNOPSIS
 typetod [\-a <attribute>] [\-c] [\-d] [\-e] [\-f] [\-l <character>] [\-m] [\-n]
 [\-q] [\-r] [\-s] [\-t <integer>] [\-w]
@@ -8,27 +8,24 @@ typetod [\-a <attribute>] [\-c] [\-d] [\-e] [\-f] [\-l <character>] [\-m] [\-n]
 typetod is a typing game which has four modes; fortune mode (default), files
 mode, RSS feeds mode, and stdin mode. And, with the first three modes, you can
 play with its endless mode. You can exit a game or leave from the screen
-anywhere typing an escape key or ctrl + e. On the menu screen, you can move
-downwards typing j and upwards typing k, and play a game with the content of
-the selected title typing space or enter key.
+anywhere typing an escape key or ctrl + e. On the menu screen, you can moves
+the cursor downwards typing j and upwards typing k, and play a game with the
+content of the selected title typing space or enter key. typetod is executed as
+follows.
 .TP
-.I
-fortune mode
-Benefitial tips from fortune command as samples.
+typetod
+fortune mode. Benefitial tips from fortune command are as samples.
 .TP
-.I
-files mode
-Text files which are local or remote (passed as URLs with http or ftp scheme)
-as samples.
+typetod <file> [<file>...]
+files mode. Text files which are local or remote (passed as URLs with http or
+ftp scheme) as samples.
 .TP
-.I
-RSS feeds mode
-the artilcles in a RSS feed as samples.
+typetod -f <url_to_rss_feed>
+RSS feeds mode. the artilcles in a RSS feed as samples.
 .TP
-.I
-stdin mode
-In this mode, typetod reads lines one by one from stdin adding it to the
-buffer of samples during the game. To enable this mode, use pipes on the
+<command> | typetod
+stdin mode. In this mode, typetod reads lines one by one from stdin adding it
+to the buffer of samples during the game. To enable this mode, use pipes on the
 command line.
 .SH OPTIONS
 .TP
@@ -72,33 +69,16 @@ search the directories to find files in them by one level.
 .B \-s
 disable the status bar.
 .TP
-.B \-t
-set the number of spaces per tab. typetod always converts all tabs of samples
+.B \-t <integer>
+sets the number of spaces per tab. typetod always converts all tabs of samples
 and input characters into spaces.
 .TP
 .B \-w
-convert multiple space to one space and erase spaces at the beginnning of the
+converts multiple space to one space and erase spaces at the beginnning of the
 line.
 .SH NOTES
 This program depends on the
 .I feedparser
 package of python.
-.SH EXAMPLE
-.TP
-typetod
-executes typetod in fortune mode.
-.TP
-typetod -d
-executes typetod in endless fortune mode.
-.TP
-typetod some_text_file another_text_file
-executes typetod in files mode.
-.TP
-typetod -f http://www.autocar.co.uk/rss/
-executes typetod in RSS feeds mode. This is not a advertisement cause I loves
-cars.
-.TP
-fortune | typetod
-one-time fortune mode by stdin mode
 .SH SEE ALSO
 .I python
