@@ -1,6 +1,6 @@
-# typetod - typing game with endless mode written in python
+# typetod - type everything forever
 
-VERSION = 0.01
+VERSION = 0.02
 
 PREFIX ?= /usr
 MANPREFIX ?= /usr/share
