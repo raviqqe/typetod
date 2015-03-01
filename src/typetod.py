@@ -437,7 +437,7 @@ def uni_to_ascii(text):
     return unidecode.unidecode(text)
   except ImportError:
     return text.translate(TRANS_TABLE).encode('ascii',
-        errors='backslashreplace').decode('ascii')
+        'backslashreplace').decode('ascii')
 
 
 # main routine
