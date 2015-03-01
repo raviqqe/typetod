@@ -522,17 +522,17 @@ elif rss_mode:
   fail('assign one url as an argument to play in rss mode')
 elif len(args) > 0:
   items = Items([])
-  for filename in args:
-    if os.path.isfile(filename):
-      items.append(LocalFile(filename))
-    elif os.path.isdir(filename) and RECURSIVE_SEARCH:
-      for file_in_dir in os.listdir(filename):
+  for resource in args:
+    if os.path.isfile(resource):
+      items.append(LocalFile(resource))
+    elif os.path.isdir(resource) and RECURSIVE_SEARCH:
+      for file_in_dir in os.listdir(resource):
         if os.path.isfile(os.path.join(file_in_dir, f)):
           items.append(LocalFile(file_in_dir))
     else:
-      url = urllib.parse.urlparse(filename)
+      url = urllib.parse.urlparse(resource)
       signal.signal(signal.SIGALRM, lambda signum, frame: \
-          fail('host, {} of url, {} timed out'.format(url.netloc, filename)))
+          fail('host, {} of url, {} timed out'.format(url.netloc, resource)))
       signal.setitimer(signal.ITIMER_REAL, 5)
       if url.scheme == 'http' or url.scheme == 'https':
         if url.scheme == 'http':
@@ -544,11 +544,11 @@ elif len(args) > 0:
           status = conn.getresponse().status
           conn.close()
           if status < 400:
-            items.append(RemoteFile(filename))
+            items.append(RemoteFile(resource))
           else:
             raise
         except:
-          invalid_url(filename)
+          invalid_url(resource)
       elif url.scheme == 'ftp' and len(url.path) == 0:
         fail('file path is needed in url with ftp protocol')
       elif url.scheme == 'ftp':
@@ -556,15 +556,15 @@ elif len(args) > 0:
           with ftplib.FTP(url.netloc) as conn:
             conn.login()
             if url.path in conn.nlst(os.path.dirname(url.path)):
-              items.append(RemoteFile(filename))
+              items.append(RemoteFile(resource))
             else:
               raise
         except:
-          invalid_url(filename)
+          invalid_url(resource)
       elif url.scheme:
-        fail("invalid scheme, {} of uri, {}".format(url.scheme, filename))
+        fail("invalid scheme, {} of uri, {}".format(url.scheme, resource))
       else:
-        fail("file, '{}' doesn't exist".format(filename))
+        fail("file, '{}' doesn't exist".format(resource))
       signal.setitimer(signal.ITIMER_REAL, 0)
 else:
   MENU_SCREEN = not MENU_SCREEN
