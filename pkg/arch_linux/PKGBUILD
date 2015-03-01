@@ -6,7 +6,8 @@ pkgdesc="typing game to let you type anything forever"
 arch=('any')
 url="https://github.com/raviqqe/typetod"
 license=('custom:UNLICENSE')
-depends=('python-feedparser')
+depends=('python' 'python-feedparser')
+optdepends=('python-unidecode')
 source=("https://github.com/raviqqe/$pkgname/"\
 "raw/master/pkg/$pkgname-$pkgver.tar.gz")
 md5sums=('4f41e1d0bb791876bb0d7dadc8a135cf')
