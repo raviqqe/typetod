@@ -421,6 +421,9 @@ def fail(err_msg):
   perror(err_msg)
   exit(1)
 
+def invalid_url(url):
+  fail("url, {} is invalid".format(url))
+
 def conv_tabs(text):
   return text.replace('\t', ' ' * TAB_SPACES)
 
@@ -527,20 +530,29 @@ elif len(args) > 0:
           items.append(LocalFile(file_in_dir))
     else:
       url = urllib.parse.urlparse(filename)
+      signal.signal(signal.SIGALRM, \
+          lambda signum, frame: invalid_url(filename))
+      signal.setitimer(signal.ITIMER_REAL, 5)
       if url.scheme == 'http' or url.scheme == 'https':
         if url.scheme == 'http':
           conn = http.client.HTTPConnection(url.netloc)
         elif url.scheme == 'https':
           conn = http.client.HTTPSConnection(url.netloc)
-        conn.request('HEAD', url.path)
-        status = conn.getresponse().status
-        conn.close()
-        if status < 400:
-          items.append(RemoteFile(filename))
-        else:
-          fail("url, {} is invalid".format(filename))
+        try:
+          conn.request('HEAD', url.path)
+          status = conn.getresponse().status
+          conn.close()
+          if status < 400:
+            items.append(RemoteFile(filename))
+          else:
+            invalid_url(filename)
+        except:
+          invalid_url(filename)
+      elif url.scheme:
+        invalid_url(filename)
       else:
-        fail("resource, '{}' doesn't exist or invalid".format(filename))
+        fail("file, '{}' doesn't exist".format(filename))
+      signal.setitimer(signal.ITIMER_REAL, 0)
 else:
   MENU_SCREEN = not MENU_SCREEN
   items = Fortunes([])
