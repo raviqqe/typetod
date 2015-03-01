@@ -115,6 +115,7 @@ class Game:
   A_CORRECT = curses.A_NORMAL
   A_ERROR = curses.A_REVERSE
   MORPHING = False
+  ERASE_MULTIPLE_SPACE = False
 
   def __init__(self, window):
     self.window = window
@@ -293,6 +294,8 @@ class Game:
         re.sub(r'[ \n]+$', '', conv_tabs(text))))
     if not self.KEEP_EMPTY_LINES:
       text = re.sub(r'\n+', r'\n', text)
+    if self.ERASE_MULTIPLE_SPACE:
+      text = re.sub(r'\n +', r'\n', re.sub(' +', ' ', text))
     while len(text) > 0:
       index = text.find('\n', 0, self.width)
       if index >= 0:
@@ -436,7 +439,7 @@ if not sys.stdout.isatty():
 
 ## parse command line arguments
 try:
-  opts, args = getopt.getopt(sys.argv[1:], 'a:cdefl:mnqrst:')
+  opts, args = getopt.getopt(sys.argv[1:], 'a:cdefl:mnqrst:w')
 except getopt.GetoptError as err:
   fail(str(err))
 
@@ -485,6 +488,8 @@ for option, value in opts:
       TAB_SPACES = int(value)
     else:
       fail('the argument of option, -e must be an integer')
+  elif option == '-w':
+    Game.ERASE_MULTIPLE_SPACE = True
 
 if not os.isatty(0) and len(args) == 0:
   ENDLESS = True
