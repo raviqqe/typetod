@@ -531,8 +531,8 @@ elif len(args) > 0:
           items.append(LocalFile(file_in_dir))
     else:
       url = urllib.parse.urlparse(filename)
-      signal.signal(signal.SIGALRM, \
-          lambda signum, frame: invalid_url(filename))
+      signal.signal(signal.SIGALRM, lambda signum, frame: \
+          fail('host, {} of url, {} timed out'.format(url.netloc, filename)))
       signal.setitimer(signal.ITIMER_REAL, 5)
       if url.scheme == 'http' or url.scheme == 'https':
         if url.scheme == 'http':
