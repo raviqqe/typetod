@@ -526,8 +526,8 @@ elif len(args) > 0:
       items.append(LocalFile(resource))
     elif os.path.isdir(resource) and RECURSIVE_SEARCH:
       for file_in_dir in os.listdir(resource):
-        if os.path.isfile(os.path.join(file_in_dir, f)):
-          items.append(LocalFile(file_in_dir))
+        if os.path.isfile(os.path.join(resource, file_in_dir)):
+          items.append(LocalFile(os.path.join(resource, file_in_dir)))
     else:
       url = urllib.parse.urlparse(resource)
       signal.signal(signal.SIGALRM, lambda signum, frame: \
