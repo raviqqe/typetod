@@ -688,7 +688,8 @@ try:
           break
         elif char == 21: # 21 is ctrl + 'u'
           game.clear_input_line()
-        elif char == curses.KEY_BACKSPACE or char == curses.KEY_DC:
+        elif char == curses.ascii.DEL or char == curses.ascii.BS \
+            or char == curses.KEY_BACKSPACE or char == curses.KEY_DC:
           game.del_char()
         elif 32 <= char <= 126 \
             or char == curses.ascii.NL \
