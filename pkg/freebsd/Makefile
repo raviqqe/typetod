@@ -7,7 +7,7 @@ PORTNAME=	typetod
 PORTVERSION= 0.02
 PORTREVISION=	1
 CATEGORIES=	games
-MASTER_SITES=	http://github.com/raviqqe/${PORTNAME}/raw/master/pkg/${PORTNAME}-${PORTVERSION}.tar.gz
+MASTER_SITES=	http://github.com/raviqqe/${PORTNAME}/raw/master/pkg/
 
 MAINTAINER=	raviqqe@gmail.com
 COMMENT= typing game with endless mode
