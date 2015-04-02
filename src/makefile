@@ -2,7 +2,7 @@
 
 VERSION = 0.02
 
-PREFIX ?= /usr
+PREFIX ?= /usr/local
 MANPREFIX ?= /usr/share
 BINDIR = ${DESTDIR}${PREFIX}/bin
 MANDIR = ${DESTDIR}${MANPREFIX}/man/man6

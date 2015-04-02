@@ -4,26 +4,23 @@
 # THIS MAKEFILE IS WORK IN PROGRESS
 
 PORTNAME=	typetod
-PORTVERSION= 0.03
+PORTVERSION= 0.02
 PORTREVISION=	1
 CATEGORIES=	games
-MASTER_SITES=	https://github.com/raviqqe/${PORTNAME}/ \
+MASTER_SITES=	http://github.com/raviqqe/${PORTNAME}/raw/master/pkg/${PORTNAME}-${PORTVERSION}.tar.gz
 
-MAINTAINER=	schot@a-eskwadraat.nl
-COMMENT=	Dynamic, small, fast and simple window manager
+MAINTAINER=	raviqqe@gmail.com
+COMMENT= typing game with endless mode
 
-LICENSE= PUBLICDOMAIN
-LICENSE_FILE=	${WRKSRC}/LICENSE
+LICENSE= UNLICENSE
+LICENSE_FILE=	${WRKSRC}/UNLICENSE
 
-LIB_DEPENDS=   libpthread-stubs.so:${PORTSDIR}/devel/libpthread-stubs
+#OPTIONS_DEFINE=
+#OPTIONS_DEFAULT=
+#USE_XORG=
 
-OPTIONS_DEFINE=	XINERAMA XFT DOCS
-OPTIONS_DEFAULT=XINERAMA
-
-USE_XORG=	x11 xau xcb xdmcp xext
-
-PLIST_FILES=	bin/dwm \
-		man/man1/dwm.1.gz
+PLIST_FILES=	bin/typetod
+		man/man6/typetod.6.gz
 PORTDOCS=	README
 
 .include <bsd.port.options.mk>
@@ -64,9 +61,5 @@ post-patch:
 	@${REINPLACE_CMD} -e 's,$${XFTLIBS},,g' \
 	         -e 's,$${XFTINCS},,g' ${WRKSRC}/config.mk
 .endif
-
-post-install:
-	@${MKDIR} ${STAGEDIR}${DOCSDIR}
-	${INSTALL_DATA} ${WRKSRC}/README ${STAGEDIR}${DOCSDIR}
 
 .include <bsd.port.mk>
