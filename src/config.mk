@@ -1,7 +1,6 @@
 # change these parameters to fit it to your system
 
 PREFIX ?= /usr/local
-MANPREFIX ?= /usr/local
 
 BINDIR = ${DESTDIR}${PREFIX}/bin
-MANDIR = ${DESTDIR}${MANPREFIX}/man/man6
+MANDIR = ${DESTDIR}${PREFIX}/man/man6
