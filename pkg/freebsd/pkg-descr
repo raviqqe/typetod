@@ -1,0 +1,6 @@
+typetod - type everything forever
+typetod is a terminal typing game with endless mode which can read sample texts
+from fortune command, files, URLs, RSS feeds, and standard input.
+typetod is written in Python 3 and its copyright resides in public domain.
+
+WWW: http://github.com/raviqqe/typetod/
