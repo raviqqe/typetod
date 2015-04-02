@@ -1,5 +1,5 @@
 # Created by: raviqqe <raviqqe@gmail.com>
-# $FreeBSD: head/games/typetod/Makefile 351411 2015-03-31 18:28:47Z zeising $
+# $FreeBSD$
 
 # THIS MAKEFILE IS WORK IN PROGRESS
 
@@ -15,13 +15,7 @@ COMMENT= typing game with endless mode
 LICENSE= UNLICENSE
 LICENSE_FILE=	${WRKSRC}/UNLICENSE
 
-#OPTIONS_DEFINE=
-#OPTIONS_DEFAULT=
-#USE_XORG=
-
-PLIST_FILES=	bin/typetod
-		man/man6/typetod.6.gz
-PORTDOCS=	README
+PLIST_FILES=	bin/typetod man/man6/typetod.6.gz
 
 .include <bsd.port.options.mk>
 
