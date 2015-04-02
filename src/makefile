@@ -1,21 +1,24 @@
 # typetod - type everything forever
 
-VERSION = 0.02
+.include "config.mk"
 
-PREFIX ?= /usr/local
-MANPREFIX ?= /usr/share
-BINDIR = ${DESTDIR}${PREFIX}/bin
-MANDIR = ${DESTDIR}${MANPREFIX}/man/man6
+VERSION = 0.02
 
 RM = rm -rf
 
 all:
 	@echo 'nothing to be compiled'
 
-install:
-	install -m 755 -D typetod.py ${BINDIR}/typetod
+debug:
+	@echo BINDIR = ${BINDIR}
+	@echo MANDIR = ${MANDIR}
+
+man: typetod.6
 	sed 's/VERSION/${VERSION}/' typetod.6 | gzip > typetod.6.gz
-	install -m 644 -D typetod.6.gz ${MANDIR}/typetod.6.gz
+
+install: man
+	install -m 755 typetod.py ${BINDIR}/typetod
+	install -m 644 typetod.6.gz ${MANDIR}/typetod.6.gz
 
 clean:
 	${RM} typetod.6.gz
