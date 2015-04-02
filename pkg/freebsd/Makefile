@@ -3,18 +3,16 @@
 
 # THIS MAKEFILE IS WORK IN PROGRESS
 
-PORTNAME=	dwm
-PORTVERSION=	6.0
-PORTREVISION=	2
-CATEGORIES=	x11-wm
-MASTER_SITES=	http://dl.suckless.org/${PORTNAME}/ \
-		http://schot.a-eskwadraat.nl/files/
-PATCH_SITES=	http://dwm.suckless.org/patches/
+PORTNAME=	typetod
+PORTVERSION= 0.03
+PORTREVISION=	1
+CATEGORIES=	games
+MASTER_SITES=	https://github.com/raviqqe/${PORTNAME}/ \
 
 MAINTAINER=	schot@a-eskwadraat.nl
 COMMENT=	Dynamic, small, fast and simple window manager
 
-LICENSE=	MIT
+LICENSE= PUBLICDOMAIN
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
 LIB_DEPENDS=   libpthread-stubs.so:${PORTSDIR}/devel/libpthread-stubs
