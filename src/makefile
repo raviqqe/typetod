@@ -1,4 +1,6 @@
 # typetod - type everything forever
+#
+# this file is compliant with bmake (aka bsd make).
 
 .include "config.mk"
 
