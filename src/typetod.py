@@ -113,8 +113,8 @@ class Game:
   SEPARATE_SAMPLES = True
   KEEP_EMPTY_LINES = True # in sample texts
   SEP_LINE_CHAR = '-'
-  A_CORRECT = curses.A_NORMAL
-  A_ERROR = curses.A_REVERSE
+  ATTR_CORRECT = curses.A_NORMAL
+  ATTR_ERROR = curses.A_REVERSE
   MORPHING = False
   ERASE_MULTIPLE_SPACE = False
 
@@ -202,10 +202,10 @@ class Game:
     self.input_t += char
     if self.input_t[-1] \
         == self.sample_t[self.curr_sample_line][len(self.input_t) - 1]:
-      self.window.addstr(char, self.A_CORRECT)
+      self.window.addstr(char, self.ATTR_CORRECT)
       return True
     else:
-      self.window.addstr(char, self.A_ERROR)
+      self.window.addstr(char, self.ATTR_ERROR)
       return False
 
   def del_char(self):
@@ -454,15 +454,15 @@ rss_mode = False
 for option, value in opts:
   if option == '-a':
     if value == "reverse":
-      Game.A_ERROR = curses.A_REVERSE
+      Game.ATTR_ERROR = curses.A_REVERSE
     elif value == "blink":
-      Game.A_ERROR = curses.A_BLINK
+      Game.ATTR_ERROR = curses.A_BLINK
     elif value == "bold":
-      Game.A_ERROR = curses.A_BOLD
+      Game.ATTR_ERROR = curses.A_BOLD
     elif value == "underline":
-      Game.A_ERROR = curses.A_UNDERLINE
+      Game.ATTR_ERROR = curses.A_UNDERLINE
     elif value == "normal":
-      Game.A_ERROR = curses.A_NORMAL
+      Game.ATTR_ERROR = curses.A_NORMAL
     else:
       fail("the argument, '{}' of -a option is invalid\n"
           "valid arguments are 'reverse' (default), 'undreline', "
