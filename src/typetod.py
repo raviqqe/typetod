@@ -33,9 +33,9 @@ MIN_HEIGHT = 8
 MIN_WIDTH = 40
 
 ## speed unit
-U_WPM = 0
-U_CPS = 1
-SPEED_UNIT = U_WPM
+UNIT_WPM = 0
+UNIT_CPS = 1
+SPEED_UNIT = UNIT_WPM
 
 ## translation table
 TRANS_TABLE = {
@@ -220,7 +220,7 @@ class Game:
     if self.MORPHING:
       self.window.addstr(self.input_line - 1, 0,
           self.sample_t[self.curr_sample_line])
-    self.input_t = '' 
+    self.input_t = ''
     self.window.move(self.input_line, 0)
     self.window.clrtoeol()
 
@@ -251,10 +251,10 @@ class Game:
     try:
       return self.speed # when the game is over
     except:
-      if SPEED_UNIT == U_WPM:
+      if SPEED_UNIT == UNIT_WPM:
         return '{:>5.1f}wpm'.format((self.type_num - self.error_num)
             / (time.time() - self.start_time) / 5 * 60)
-      elif SPEED_UNIT == U_CPS:
+      elif SPEED_UNIT == UNIT_CPS:
         return '{:>5.2f}cps'.format((self.type_num - self.error_num)
             / (time.time() - self.start_time))
       else:
@@ -288,7 +288,7 @@ class Game:
     for y in self.sep_lines:
       self.window.addstr(y, 0, self.SEP_LINE_CHAR * self.width)
     self.window.move(self.input_line, 0)
- 
+
   def __format(self, text):
     t = []
     text = re.sub(r'^\n+', '', re.sub(r' +\n', r'\n',
@@ -468,7 +468,7 @@ for option, value in opts:
           "valid arguments are 'reverse' (default), 'undreline', "
           "'blink', 'bold', and 'normal'".format(value))
   elif option == '-c':
-    SPEED_UNIT = U_CPS
+    SPEED_UNIT = UNIT_CPS
   elif option == '-d':
     ENDLESS = True
   elif option == '-e':
@@ -593,7 +593,7 @@ try:
   if window.getmaxyx()[0] < MIN_HEIGHT or window.getmaxyx()[1] < MIN_WIDTH:
     raise FailException('your\nterminal\nis\ntoo\nsmall.\nbuy\nanother\n'
         'bigger\none.')
- 
+
   screen = Screen.hello
   while True:
     if screen == Screen.hello:
@@ -654,7 +654,7 @@ try:
           pad.refresh(0, 0, 0, 0, window.getmaxyx()[0] - 1,
               window.getmaxyx()[1] - 1)
       pad.keypad(False)
-  
+
     elif screen == Screen.game:
       game = Game(notebook)
       game.add_sample(items.popleft().get_content())
@@ -719,7 +719,7 @@ try:
       window.addstr(4, 0, "press any key...")
       window.getch()
       screen = Screen.leave
-  
+
     elif screen == Screen.leave:
       window.clear()
       window.addstr(0, 0, "leaving a game...")
@@ -734,7 +734,7 @@ try:
 
     elif screen == Screen.exit:
         break
-        
+
   # finalization
   if 'notebook' in locals():
     notebook.keypad(False)
